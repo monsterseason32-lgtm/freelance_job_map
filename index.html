@@ -655,15 +655,15 @@
         window.filterAndRender = () => {
             const q = document.getElementById('search-input').value.toLowerCase();
             const now = new Date();
-            const jobs = window.JOBS.filter(j => {
+            window.filteredJobs = window.JOBS.filter(j => {
                 const expired = j.expiryDate ? new Date(j.expiryDate) < now : false;
                 if (expired) return false;
                 const d = window.getDist(TEST_CENTER.lat, TEST_CENTER.lng, j.lat, j.lng);
                 if (d > SERVICE_RADIUS_KM) return false;
                 return !q || j.title.toLowerCase().includes(q) || j.location.toLowerCase().includes(q);
             });
-            window.renderMapMarkers(jobs);
-            window.renderJobList(jobs);
+            window.renderMapMarkers(window.filteredJobs);
+            window.renderJobList(window.filteredJobs);
         };
 
         window.renderMapMarkers = (jobs) => {
