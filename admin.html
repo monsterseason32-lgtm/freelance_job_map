@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="th" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Local Freelance</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .sidebar-link.active {
+            background-color: #f1f5f9;
+            color: #4f46e5;
+            border-right: 4px solid #4f46e5;
+        }
+
+        .table-row:hover {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body class="h-full bg-slate-50 flex overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col shrink-0">
+        <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <span class="font-bold text-slate-800">Admin Panel</span>
+        </div>
+        <nav class="flex-1 p-4 space-y-1">
+            <button onclick="window.switchTab('dashboard')" id="nav-dashboard"
+                class="sidebar-link active flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition">
+                <i data-lucide="layout-grid" class="w-4 h-4"></i> แผงควบคุม
+            </button>
+            <button onclick="window.switchTab('jobs')" id="nav-jobs"
+                class="sidebar-link flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition">
+                <i data-lucide="briefcase" class="w-4 h-4"></i> จัดการงานจ้าง
+            </button>
+            <button onclick="window.switchTab('users')" id="nav-users"
+                class="sidebar-link flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium text-slate-600 transition">
+                <i data-lucide="users" class="w-4 h-4"></i> จัดการสมาชิก
+            </button>
+        </nav>
+        <div class="p-4 border-t border-slate-100">
+            <a href="index.html"
+                class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-indigo-600 transition">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> กลับหน้าหลัก
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- Top Nav -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
+            <div class="flex items-center gap-4">
+                <button class="md:hidden text-slate-500"><i data-lucide="menu" class="w-6 h-6"></i></button>
+                <h2 id="page-title" class="text-sm font-bold text-slate-700">แผงควบคุมหลัก</h2>
+            </div>
+            <div id="admin-info" class="flex items-center gap-3">
+                <!-- Profile will be injected -->
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div id="content-container" class="flex-1 overflow-y-auto p-6 scroll-area">
+
+            <!-- Tab: Dashboard -->
+            <section id="tab-dashboard" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div
+                            class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+                            <i data-lucide="briefcase" class="w-5 h-5"></i></div>
+                        <div class="text-2xl font-bold text-slate-900" id="stat-total-jobs">0</div>
+                        <div class="text-xs text-slate-500">จำนวนงานทั้งหมดในระบบ</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div
+                            class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+                            <i data-lucide="users" class="w-5 h-5"></i></div>
+                        <div class="text-2xl font-bold text-slate-900" id="stat-total-users">0</div>
+                        <div class="text-xs text-slate-500">จำนวนสมาชิกที่ลงทะเบียน</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div
+                            class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+                            <i data-lucide="zap" class="w-5 h-5"></i></div>
+                        <div class="text-2xl font-bold text-slate-900" id="stat-active-jobs">0</div>
+                        <div class="text-xs text-slate-500">งานที่ยังไม่หมดอายุ</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Jobs -->
+            <section id="tab-jobs" class="hidden space-y-4">
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="px-6 py-4">งานจ้าง</th>
+                                <th class="px-6 py-4">ผู้ประกาศ</th>
+                                <th class="px-6 py-4 text-center">ประเภท</th>
+                                <th class="px-6 py-4 text-center">งบประมาณ</th>
+                                <th class="px-6 py-4 text-right">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jobs-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Tab: Users -->
+            <section id="tab-users" class="hidden space-y-4">
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="px-6 py-4">สมาชิก</th>
+                                <th class="px-6 py-4">ติดต่อ</th>
+                                <th class="px-6 py-4 text-center">บทบาท</th>
+                                <th class="px-6 py-4 text-right">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- DENIED SCREEN -->
+        <div id="denied-screen"
+            class="absolute inset-0 bg-white/95 backdrop-blur z-[200] hidden items-center justify-center p-6 text-center">
+            <div class="max-w-xs space-y-4">
+                <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto">
+                    <i data-lucide="lock" class="w-8 h-8"></i></div>
+                <h3 class="text-xl font-bold text-slate-900">เข้าถึงไม่ได้</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">หน้านี้เฉพาะแอดมินเท่านั้น หากคุณคือแอดมิน
+                    โปรดล็อกอินด้วยบัญชีที่ได้รับสิทธิ์</p>
+                <a href="index.html"
+                    class="block bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg">กลับไปหน้าแรก</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal: Edit Job -->
+    <div id="edit-job-modal" class="fixed inset-0 bg-black/50 z-[300] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6">
+            <h3 class="text-lg font-bold mb-4">แก้ไขรายละเอียดงาน</h3>
+            <form id="edit-job-form" class="space-y-4">
+                <input type="hidden" id="edit-job-id">
+                <input type="text" id="edit-job-title"
+                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500">
+                <textarea id="edit-job-desc" rows="4"
+                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none"></textarea>
+                <div class="flex gap-2">
+                    <button type="button" onclick="window.closeEditJobModal()"
+                        class="flex-1 py-2.5 rounded-xl border border-slate-200 font-bold text-sm">ยกเลิก</button>
+                    <button type="submit"
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm">บันทึกการเปลี่ยนแปลง</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBp1h2jHtfUG3dEokuI2NB-1L1Gke1q48",
+            authDomain: "sai-yok-freelance.firebaseapp.com",
+            projectId: "sai-yok-freelance",
+            storageBucket: "sai-yok-freelance.firebasestorage.app",
+            messagingSenderId: "165892386449",
+            appId: "1:165892386449:web:846da9f2142907d7b51930",
+            measurementId: "G-JJD9CFZJ1L"
+        };
+
+        const APP_ID = "sai-yok-freelance";
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const jobsPath = collection(db, 'artifacts', APP_ID, 'public', 'data', 'jobs');
+        const registryPath = collection(db, 'artifacts', APP_ID, 'public', 'data', 'user_registry');
+
+        window.currentUser = null;
+        window.userProfile = null;
+        window.allJobs = [];
+        window.allUsers = [];
+
+        // --- Auth Check ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                document.getElementById('denied-screen').classList.remove('hidden');
+                return;
+            }
+            const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'settings'));
+            if (!profileSnap.exists() || profileSnap.data().role !== 'admin') {
+                document.getElementById('denied-screen').classList.remove('hidden');
+            } else {
+                window.currentUser = user;
+                window.userProfile = profileSnap.data();
+                initAdmin();
+            }
+        });
+
+        function initAdmin() {
+            lucide.createIcons();
+
+            // Listen to Jobs
+            onSnapshot(query(jobsPath, orderBy("createdAt", "desc")), (snap) => {
+                window.allJobs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderStats();
+                renderJobsTable();
+            });
+
+            // Listen to Users
+            onSnapshot(registryPath, (snap) => {
+                window.allUsers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderStats();
+                renderUsersTable();
+            });
+        }
+
+        // --- Renders ---
+        function renderStats() {
+            document.getElementById('stat-total-jobs').textContent = window.allJobs.length;
+            document.getElementById('stat-total-users').textContent = window.allUsers.length;
+            const now = new Date();
+            const active = window.allJobs.filter(j => !j.expiryDate || new Date(j.expiryDate) > now).length;
+            document.getElementById('stat-active-jobs').textContent = active;
+        }
+
+        function renderJobsTable() {
+            const tbody = document.getElementById('jobs-table-body');
+            tbody.innerHTML = window.allJobs.map(job => `
+                <tr class="table-row">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-slate-800">${job.title}</div>
+                        <div class="text-[10px] text-slate-400 truncate max-w-[200px]">${job.location}</div>
+                    </td>
+                    <td class="px-6 py-4 text-xs font-medium text-slate-600">${job.company}</td>
+                    <td class="px-6 py-4 text-center"><span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded-md text-[10px] font-bold">${job.type}</span></td>
+                    <td class="px-6 py-4 text-center text-emerald-600 font-bold text-xs">฿${job.salary}</td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="window.openEditJob('${job.id}')" class="text-slate-400 hover:text-indigo-600 p-1"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                        <button onclick="window.deleteJob('${job.id}')" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons({ nodes: [tbody] });
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = window.allUsers.map(user => `
+                <tr class="table-row">
+                    <td class="px-6 py-4 flex items-center gap-3">
+                        <img src="${user.photo}" class="w-8 h-8 rounded-full border border-slate-200">
+                        <div>
+                            <div class="font-bold text-slate-800">${user.name}</div>
+                            <div class="text-[10px] text-slate-400 font-mono">${user.uid}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-slate-500">${user.email || user.phone || '-'}</td>
+                    <td class="px-6 py-4 text-center">
+                        <select onchange="window.updateUserRole('${user.uid}', this.value)" class="text-[10px] font-bold border rounded-md px-2 py-1 outline-none bg-slate-50 cursor-pointer">
+                            <option value="member" ${user.role === 'member' ? 'selected' : ''}>Member</option>
+                            <option value="worker" ${user.role === 'worker' ? 'selected' : ''}>Worker</option>
+                            <option value="employer" ${user.role === 'employer' ? 'selected' : ''}>Employer</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="window.deleteUser('${user.uid}')" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="user-minus" class="w-4 h-4"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons({ nodes: [tbody] });
+        }
+
+        // --- Actions ---
+        window.deleteJob = async (id) => {
+            if (!confirm("คุณต้องการลบประกาศนี้ใช่หรือไม่?")) return;
+            await deleteDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'jobs', id));
+        };
+
+        window.openEditJob = (id) => {
+            const job = window.allJobs.find(j => j.id === id);
+            if (!job) return;
+            document.getElementById('edit-job-id').value = id;
+            document.getElementById('edit-job-title').value = job.title;
+            document.getElementById('edit-job-desc').value = job.desc;
+            document.getElementById('edit-job-modal').classList.remove('hidden');
+            document.getElementById('edit-job-modal').classList.add('flex');
+        };
+
+        window.closeEditJobModal = () => {
+            document.getElementById('edit-job-modal').classList.add('hidden');
+            document.getElementById('edit-job-modal').classList.remove('flex');
+        };
+
+        document.getElementById('edit-job-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-job-id').value;
+            const title = document.getElementById('edit-job-title').value;
+            const desc = document.getElementById('edit-job-desc').value;
+            await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'jobs', id), { title, desc });
+            window.closeEditJobModal();
+        };
+
+        window.updateUserRole = async (uid, newRole) => {
+            // Update Public Registry
+            await updateDoc(doc(registryPath, uid), { role: newRole });
+            // Update Private Settings (This might need permission in rules)
+            await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'settings'), { role: newRole }, { merge: true });
+        };
+
+        window.deleteUser = async (uid) => {
+            if (!confirm("ลบข้อมูลสมาชิกรายนี้ออกจากสารบบหรือไม่? (บัญชีผู้ใช้จะยังคงอยู่แต่ข้อมูลโปรไฟล์จะหายไป)")) return;
+            await deleteDoc(doc(registryPath, uid));
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('nav-' + tab).classList.add('active');
+            document.getElementById('page-title').textContent = { dashboard: 'แผงควบคุมหลัก', jobs: 'จัดการงานจ้างทั้งหมด', users: 'จัดการสมาชิก' }[tab];
+        };
+
+    </script>
+</body>
+
+</html>
