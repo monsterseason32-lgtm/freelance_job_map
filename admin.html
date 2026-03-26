@@ -211,25 +211,14 @@
                 document.getElementById('denied-screen').classList.remove('hidden');
                 return;
             }
-
-            // Auto-Elevate to Admin & Register Profile for Dashboard
-            const profileRef = doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'settings');
-            const registryRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'user_registry', user.uid);
-
-            await setDoc(profileRef, { role: 'admin' }, { merge: true });
-            await setDoc(registryRef, {
-                uid: user.uid,
-                name: user.displayName || user.email || user.phoneNumber || 'Admin',
-                email: user.email || '',
-                phone: user.phoneNumber || '',
-                photo: user.photoURL || `https://ui-avatars.com/api/?name=Admin`,
-                role: 'admin'
-            }, { merge: true });
-
-            document.getElementById('denied-screen').classList.add('hidden');
-            window.currentUser = user;
-            window.userProfile = { role: 'admin' };
-            initAdmin();
+            const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'settings'));
+            if (!profileSnap.exists() || profileSnap.data().role !== 'admin') {
+                document.getElementById('denied-screen').classList.remove('hidden');
+            } else {
+                window.currentUser = user;
+                window.userProfile = profileSnap.data();
+                initAdmin();
+            }
         });
 
         function initAdmin() {
