@@ -4,290 +4,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Freelance - ระบบสมาชิกอัจฉริยะ</title>
+    <title>Local Freelance - ระบบสมาชิกและบทบาท</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&amp;display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <style>
-        * {
-            font-family: 'Kanit', sans-serif;
-        }
-
-        .job-card {
-            transition: all 0.2s ease;
-        }
-
-        .job-card:active {
-            transform: scale(0.98);
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-up {
-            animation: fadeUp 0.3s ease forwards;
-        }
-
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            gap: 3px;
-        }
-
-        .scroll-area::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .scroll-area::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        #leaflet-map {
-            z-index: 1;
-            height: 100%;
-            width: 100%;
-            background: #f1f5f9;
-        }
-
-        #picker-map {
-            height: 200px;
-            width: 100%;
-            border-radius: 12px;
-            z-index: 1;
-            border: 1px solid #e2e8f0;
-        }
-
-        .job-marker {
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-        }
-
-        .loading-pulse {
-            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: .5;
-            }
-        }
-
-        .category-btn,
-        .duration-btn {
-            transition: all 0.2s;
-            border: 2px solid #f1f5f9;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .category-btn.active,
-        .duration-btn.active {
-            border-color: #6366f1;
-            background-color: #f5f3ff;
-            color: #4338ca;
-        }
-
-        .custom-select-wrapper {
-            position: relative;
-        }
-
-        .custom-select-wrapper::after {
-            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-        }
-
-        .toast-active {
-            opacity: 1 !important;
-            transform: translate(-50%, 0) !important;
-            bottom: 40px !important;
-            pointer-events: auto !important;
-        }
-
-        .auth-btn {
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 10px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 8px;
-        }
-
-        .auth-btn:hover {
-            background-color: #f8fafc;
-        }
+        * { font-family: 'Kanit', sans-serif; }
+        .job-card { transition: all 0.2s ease; }
+        .job-card:active { transform: scale(0.98); }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-up { animation: fadeUp 0.3s ease forwards; }
+        .tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 500; gap: 3px; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        #leaflet-map { z-index: 1; height: 100%; width: 100%; background: #f1f5f9; }
+        #picker-map { height: 200px; width: 100%; border-radius: 12px; z-index: 1; border: 1px solid #e2e8f0; }
+        .job-marker { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); cursor: pointer; }
+        .category-btn, .duration-btn, .role-btn { transition: all 0.2s; border: 2px solid #f1f5f9; cursor: pointer; text-align: center; }
+        .category-btn.active, .duration-btn.active, .role-btn.active { border-color: #6366f1; background-color: #f5f3ff; color: #4338ca; }
+        .toast-active { opacity: 1 !important; transform: translate(-50%, 0) !important; bottom: 40px !important; pointer-events: auto !important; }
+        .auth-btn { transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px; border-radius: 12px; font-weight: 600; font-size: 0.875rem; border: 1px solid #e2e8f0; margin-bottom: 8px; }
+        .auth-btn:hover { background-color: #f8fafc; }
     </style>
 </head>
 
 <body class="h-full bg-slate-50 text-slate-800 overflow-hidden flex flex-col">
     <div id="app" class="h-full w-full flex flex-col overflow-hidden">
-        <!-- Error Banner -->
-        <div id="error-banner"
-            class="hidden bg-rose-600 text-white px-4 py-3 text-center text-xs font-medium z-[100] shadow-lg">
-            <div class="max-w-4xl mx-auto flex items-center justify-center flex-wrap gap-2">
-                <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
-                <span id="error-message">โปรดเปิดใช้งาน Cloud Firestore & Authentication ใน Firebase Console</span>
-            </div>
-        </div>
-
+        
         <!-- Header -->
-        <header
-            class="bg-indigo-700 text-white px-3 py-2 md:px-4 md:py-3 flex items-center gap-2 md:gap-3 shrink-0 shadow-lg relative z-20">
-            <div
-                class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+        <header class="bg-indigo-700 text-white px-3 py-2 md:px-4 md:py-3 flex items-center gap-2 md:gap-3 shrink-0 shadow-lg relative z-20">
+            <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                 <i data-lucide="shield-check" class="w-5 h-5 md:w-6 md:h-6 text-white"></i>
             </div>
             <div class="min-w-0 flex-1">
-                <h1 class="text-sm md:text-lg font-bold tracking-tight leading-none truncate">Local Freelance Member
-                </h1>
+                <h1 class="text-sm md:text-lg font-bold tracking-tight leading-none truncate uppercase tracking-tight">Local Freelance</h1>
                 <div class="flex items-center gap-2 mt-1">
-                    <span id="db-status"
-                        class="bg-amber-400 text-indigo-900 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">Connecting...</span>
-                    <p class="hidden sm:block text-[10px] text-indigo-100 opacity-80">ไทรโยค - ทองผาภูมิ (Real-time)</p>
+                    <span id="db-status" class="bg-emerald-400 text-indigo-900 text-[8px] font-black px-1.5 py-0.5 rounded uppercase">Live</span>
+                    <span id="user-role-badge" class="hidden bg-white/20 text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">User</span>
                 </div>
             </div>
-
-            <!-- User Profile Area -->
-            <div id="user-header-area" class="flex items-center gap-3">
-                <button onclick="window.openAuthModal()"
-                    class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">เข้าสู่ระบบ</button>
+            
+            <!-- User Area (Only Avatar as requested) -->
+            <div id="user-header-area" class="flex items-center gap-2">
+                <button onclick="window.openAuthModal()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">เข้าสู่ระบบ</button>
             </div>
         </header>
 
-        <!-- Search Bar -->
+        <!-- Main UI -->
         <div class="px-3 py-2 md:px-4 md:py-3 bg-white border-b border-slate-200 shrink-0 relative z-10 shadow-sm">
             <div class="max-w-5xl mx-auto flex gap-2">
                 <div class="relative flex-1">
-                    <i data-lucide="search"
-                        class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"></i>
-                    <input id="search-input" type="text" placeholder="ค้นหาตำแหน่งงานจ้าง..."
-                        class="w-full pl-8 pr-3 py-2 rounded-lg md:rounded-xl border border-slate-200 bg-slate-50 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                    <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"></i>
+                    <input id="search-input" type="text" placeholder="ค้นหาประกาศในพื้นที่..." class="w-full pl-8 pr-3 py-2 rounded-lg md:rounded-xl border border-slate-200 bg-slate-50 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
                 </div>
-                <button onclick="window.checkAuthAndOpenPost()"
-                    class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-bold flex items-center gap-1.5 transition shadow-sm active:scale-95">
+                <button onclick="window.checkAuthAndOpenPost()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-bold flex items-center gap-1.5 transition shadow-sm active:scale-95">
                     <i data-lucide="plus" class="w-4 h-4"></i> ลงประกาศ
                 </button>
             </div>
         </div>
 
-        <!-- Main Content Area -->
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
             <div id="map-container" class="relative flex-[2] md:flex-1 overflow-hidden min-h-[200px] md:min-h-0">
                 <div id="leaflet-map"></div>
                 <div class="absolute bottom-4 right-4 z-[10]">
-                    <button onclick="window.centerToHome()"
-                        class="bg-white p-2.5 rounded-full shadow-lg border border-slate-200 text-indigo-600 active:scale-90 transition">
+                    <button onclick="window.centerToHome()" class="bg-white p-2.5 rounded-full shadow-lg border border-slate-200 text-indigo-600 active:scale-90 transition">
                         <i data-lucide="home" class="w-5 h-5"></i>
                     </button>
                 </div>
             </div>
 
-            <div id="job-panel"
-                class="flex-[3] md:w-96 md:flex-none bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col overflow-hidden">
-                <div
-                    class="px-3 py-2 md:px-4 md:py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/30">
-                    <h2 class="text-xs md:text-sm font-bold text-slate-700 text-indigo-900 uppercase">ประกาศล่าสุด</h2>
-                    <span id="job-count-badge"
-                        class="bg-indigo-100 text-indigo-700 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded">0</span>
+            <div id="job-panel" class="flex-[3] md:w-96 md:flex-none bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col overflow-hidden">
+                <div class="px-3 py-2 md:px-4 md:py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/30">
+                    <h2 class="text-xs md:text-sm font-bold text-slate-700 text-indigo-900">ประกาศล่าสุด</h2>
+                    <span id="job-count-badge" class="bg-indigo-100 text-indigo-700 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded">0</span>
                 </div>
                 <div id="job-list" class="flex-1 overflow-y-auto scroll-area p-2 md:p-3 space-y-2 md:space-y-3"></div>
-                <div id="no-results"
-                    class="hidden flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
+                <div id="no-results" class="hidden flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center text-xs font-medium">
                     <i data-lucide="search-x" class="w-10 h-10 mb-2 opacity-30"></i>
-                    <p class="text-xs font-semibold">ไม่พบประกาศงานในพื้นที่</p>
+                    <p>ไม่พบประกาศงานในพื้นที่</p>
                 </div>
             </div>
         </div>
 
-        <!-- Modal: Login -->
-        <div id="auth-modal-overlay"
-            class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+        <!-- Modal: Auth -->
+        <div id="auth-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
             <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 animate-fade-up">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold text-slate-900">เข้าสู่ระบบสมาชิก</h3>
-                    <button onclick="window.closeAuthModal()" class="text-slate-400 hover:text-slate-600"><i
-                            data-lucide="x" class="w-6 h-6"></i></button>
+                    <h3 class="text-xl font-bold text-slate-900">เข้าร่วมชุมชน</h3>
+                    <button onclick="window.closeAuthModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-6 h-6"></i></button>
                 </div>
                 <div class="space-y-2 mb-6">
                     <button onclick="window.loginWithGoogle()" class="auth-btn hover:border-blue-400 text-slate-700">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
-                        Google Login
+                        เข้าสู่ระบบด้วย Google
                     </button>
                 </div>
                 <div class="relative flex items-center justify-center mb-6">
                     <div class="border-t border-slate-200 w-full"></div>
-                    <span class="bg-white px-3 text-[10px] text-slate-400 uppercase font-bold absolute">หรือใช้อีเมล /
-                        เบอร์โทร</span>
+                    <span class="bg-white px-3 text-[10px] text-slate-400 uppercase font-bold absolute">หรือใช้วิธีอื่น</span>
                 </div>
                 <div id="auth-form-container">
                     <div class="flex border-b border-slate-100 mb-4 text-xs font-bold">
-                        <button onclick="window.switchAuthTab('email')" id="tab-email"
-                            class="flex-1 py-2 border-b-2 border-indigo-600 text-indigo-600">อีเมล</button>
-                        <button onclick="window.switchAuthTab('phone')" id="tab-phone"
-                            class="flex-1 py-2 border-b-2 border-transparent text-slate-400">เบอร์โทร (OTP)</button>
+                        <button onclick="window.switchAuthTab('email')" id="tab-email" class="flex-1 py-2 border-b-2 border-indigo-600 text-indigo-600">อีเมล</button>
+                        <button onclick="window.switchAuthTab('phone')" id="tab-phone" class="flex-1 py-2 border-b-2 border-transparent text-slate-400">เบอร์โทร</button>
                     </div>
                     <div id="email-section" class="space-y-3">
-                        <input type="email" id="auth-email" placeholder="อีเมล"
-                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
-                        <input type="password" id="auth-password" placeholder="รหัสผ่าน"
-                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        <input type="email" id="auth-email" placeholder="อีเมล" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        <input type="password" id="auth-password" placeholder="รหัสผ่าน" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
                         <div class="flex gap-2">
-                            <button onclick="window.handleEmailAuth('signin')"
-                                class="flex-1 bg-indigo-600 text-white py-2.5 rounded-xl text-xs font-bold">เข้าสู่ระบบ</button>
-                            <button onclick="window.handleEmailAuth('signup')"
-                                class="flex-1 border border-indigo-200 text-indigo-600 py-2.5 rounded-xl text-xs font-bold">สมัครใหม่</button>
+                            <button onclick="window.handleEmailAuth('signin')" class="flex-1 bg-indigo-600 text-white py-2.5 rounded-xl text-xs font-bold">เข้าสู่ระบบ</button>
+                            <button onclick="window.handleEmailAuth('signup')" class="flex-1 border border-indigo-200 text-indigo-600 py-2.5 rounded-xl text-xs font-bold">สมัครใหม่</button>
                         </div>
                     </div>
                     <div id="phone-section" class="hidden space-y-3">
                         <div id="phone-input-group" class="flex gap-2">
-                            <input type="tel" id="auth-phone" placeholder="08X-XXX-XXXX"
-                                class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
-                            <button onclick="window.sendPhoneOTP()" id="send-otp-btn"
-                                class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold">ส่งรหัส</button>
+                            <input type="tel" id="auth-phone" placeholder="08X-XXX-XXXX" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
+                            <button onclick="window.sendPhoneOTP()" id="send-otp-btn" class="bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold">ส่งรหัส</button>
                         </div>
                         <div id="otp-input-group" class="hidden flex gap-2">
-                            <input type="number" id="auth-otp" placeholder="รหัส 6 หลัก"
-                                class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
-                            <button onclick="window.verifyPhoneOTP()"
-                                class="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold">ยืนยัน</button>
+                            <input type="number" id="auth-otp" placeholder="รหัส 6 หลัก" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
+                            <button onclick="window.verifyPhoneOTP()" class="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold">ยืนยัน</button>
                         </div>
                         <div id="recaptcha-container"></div>
                     </div>
@@ -296,27 +134,32 @@
         </div>
 
         <!-- Modal: Add Job -->
-        <div id="add-modal-overlay"
-            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] hidden items-center justify-center p-3">
-            <div
-                class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[95%] flex flex-col overflow-hidden animate-fade-up">
+        <div id="add-modal-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] hidden items-center justify-center p-3">
+            <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[95%] flex flex-col overflow-hidden animate-fade-up">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
                     <h3 class="text-lg font-bold text-slate-900">ลงประกาศงานใหม่</h3>
-                    <button onclick="window.closeAddModal()"
-                        class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition"><i
-                            data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+                    <button onclick="window.closeAddModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
                 </div>
                 <form id="add-job-form" class="p-5 overflow-y-auto scroll-area space-y-5">
+                    
+                    <!-- Role Selection Section -->
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">คุณกำลังลงประกาศในฐานะ</label>
+                        <input type="hidden" name="role" id="form-role-input" value="employer">
+                        <div class="flex gap-2">
+                            <button type="button" onclick="window.selectRole('employer')" class="role-btn flex-1 py-3 rounded-2xl bg-white text-xs font-bold active" data-role="employer">ผู้ลงประกาศ (จ้างงาน)</button>
+                            <button type="button" onclick="window.selectRole('worker')" class="role-btn flex-1 py-3 rounded-2xl bg-white text-xs font-bold" data-role="worker">ผู้รับงาน (หางาน)</button>
+                        </div>
+                    </div>
+
                     <div class="space-y-3">
                         <div id="picker-map"></div>
                         <div id="location-status-box" class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl">
                             <div class="flex items-start gap-2.5">
                                 <i data-lucide="map-pin" class="w-4 h-4 text-indigo-600 mt-0.5"></i>
-                                <div class="flex-1 min-w-0">
-                                    <div id="location-status-title"
-                                        class="text-[10px] font-bold text-indigo-400 uppercase mb-1">ตำแหน่งงาน</div>
-                                    <div id="display-address" class="text-xs text-slate-900 font-medium">
-                                        โปรดเลือกบนแผนที่</div>
+                                <div class="flex-1 min-w-0 text-xs">
+                                    <div id="location-status-title" class="text-[10px] font-bold text-indigo-400 uppercase mb-1">ตำแหน่งงาน</div>
+                                    <div id="display-address" class="text-slate-900 font-medium">โปรดเลือกบนแผนที่</div>
                                 </div>
                             </div>
                         </div>
@@ -325,67 +168,51 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">หัวข้อจ้างงาน</label>
-                            <input type="text" id="job-title-input" name="title" required
-                                placeholder="เช่น หาคนล้างแอร์ 3 เครื่อง"
-                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        <div class="space-y-1 text-xs">
+                            <label class="font-bold text-slate-400 uppercase">หัวข้อจ้างงาน</label>
+                            <input type="text" id="job-title-input" name="title" required placeholder="เช่น หาคนล้างแอร์" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 outline-none">
                         </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">ชื่อผู้ประกาศ
-                                (จะจดจำไว้ให้ในครั้งถัดไป)</label>
-                            <input type="text" id="job-company-input" name="company" required
-                                placeholder="ชื่อคุณ / ร้านค้า"
-                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        <div class="space-y-1 text-xs">
+                            <label class="font-bold text-slate-400 uppercase">ชื่อผู้ประกาศ</label>
+                            <input type="text" id="job-company-input" name="company" required placeholder="ชื่อที่ต้องการให้แสดง" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-4 focus:ring-indigo-500/10 outline-none">
                         </div>
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase">เลือกหมวดหมู่</label>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">หมวดหมู่</label>
                         <input type="hidden" name="type" id="form-category-input" required value="general">
                         <div id="form-category-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">งบประมาณ (฿)</label>
-                            <input type="text" name="salary" required placeholder="งบประมาณ"
-                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
+                        <div class="space-y-1 text-xs">
+                            <label class="font-bold text-slate-400 uppercase">งบประมาณ (฿)</label>
+                            <input type="text" name="salary" required placeholder="งบประมาณ" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none">
                         </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">เบอร์ติดต่อ</label>
-                            <input type="tel" id="job-contact-input" name="contact" required placeholder="08X-XXX-XXXX"
-                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
+                        <div class="space-y-1 text-xs">
+                            <label class="font-bold text-slate-400 uppercase">เบอร์ติดต่อ</label>
+                            <input type="tel" id="job-contact-input" name="contact" required placeholder="08X-XXX-XXXX" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">ย่าน / พื้นที่</label>
-                            <input type="text" id="form-location-input" name="location" required placeholder="ระบุย่าน"
-                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
+                        <div class="space-y-1 text-xs">
+                            <label class="font-bold text-slate-400 uppercase">ย่าน / พื้นที่</label>
+                            <input type="text" id="form-location-input" name="location" required placeholder="ระบุย่าน" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none">
                         </div>
-                        <div class="space-y-1">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase">ระยะเวลาประกาศ</label>
+                        <div class="space-y-1 text-xs">
+                            <label class="font-bold text-slate-400 uppercase">ระยะเวลาประกาศ</label>
                             <input type="hidden" name="duration" id="form-duration-input" value="3">
                             <div id="duration-selection" class="flex gap-2">
-                                <button type="button" onclick="window.selectDuration(1)"
-                                    class="duration-btn flex-1 py-2 rounded-xl bg-white text-xs font-bold"
-                                    data-days="1">1 วัน</button>
-                                <button type="button" onclick="window.selectDuration(3)"
-                                    class="duration-btn flex-1 py-2 rounded-xl bg-white text-xs font-bold active"
-                                    data-days="3">3 วัน</button>
-                                <button type="button" onclick="window.selectDuration(7)"
-                                    class="duration-btn flex-1 py-2 rounded-xl bg-white text-xs font-bold"
-                                    data-days="7">7 วัน</button>
+                                <button type="button" onclick="window.selectDuration(1)" class="duration-btn flex-1 py-2.5 rounded-xl bg-white font-bold" data-days="1">1 วัน</button>
+                                <button type="button" onclick="window.selectDuration(3)" class="duration-btn flex-1 py-2.5 rounded-xl bg-white font-bold active" data-days="3">3 วัน</button>
+                                <button type="button" onclick="window.selectDuration(7)" class="duration-btn flex-1 py-2.5 rounded-xl bg-white font-bold" data-days="7">7 วัน</button>
                             </div>
                         </div>
                     </div>
 
-                    <textarea id="job-desc-textarea" name="desc" rows="3" required placeholder="รายละเอียดงาน..."
-                        class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm transition-all mt-4 outline-none"></textarea>
-                    <button id="submit-post-btn" type="submit"
-                        class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-lg text-sm flex items-center justify-center gap-2 mt-4 transition active:scale-95">
+                    <textarea id="job-desc-textarea" name="desc" rows="3" required placeholder="รายละเอียดงาน..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm transition-all mt-4 outline-none"></textarea>
+                    <button id="submit-post-btn" type="submit" class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 shadow-lg text-sm flex items-center justify-center gap-2 mt-4 transition active:scale-95">
                         <i data-lucide="check" class="w-5 h-5"></i> ยืนยันการลงประกาศ
                     </button>
                 </form>
@@ -393,31 +220,27 @@
         </div>
 
         <!-- Modal: Details -->
-        <div id="modal-overlay"
-            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-3 animate-fade-in">
-            <div id="modal-content"
-                class="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90%] overflow-y-auto scroll-area animate-fade-up">
-                <div id="modal-header"
-                    class="p-5 border-b border-slate-100 flex items-start justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
+        <div id="modal-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
+            <div id="modal-content" class="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90%] overflow-y-auto scroll-area">
+                <div id="modal-header" class="p-5 border-b border-slate-100 flex items-start justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
                     <div class="min-w-0 pr-2">
                         <h3 id="modal-title" class="text-base md:text-xl font-bold text-slate-900 leading-tight"></h3>
-                        <div class="flex items-center gap-1.5 mt-1.5"><i data-lucide="user"
-                                class="w-3.5 h-3.5 text-slate-400"></i><span id="modal-company"
-                                class="text-xs font-semibold text-slate-600"></span></div>
+                        <div class="flex items-center gap-1.5 mt-1.5">
+                            <i data-lucide="user" class="w-3.5 h-3.5 text-slate-400"></i>
+                            <span id="modal-company" class="text-xs font-semibold text-slate-600"></span>
+                        </div>
                     </div>
-                    <button onclick="window.closeModal()"
-                        class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 shrink-0 transition"><i
-                            data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+                    <button onclick="window.closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 shrink-0 transition">
+                        <i data-lucide="x" class="w-4 h-4 text-slate-500"></i>
+                    </button>
                 </div>
                 <div id="modal-body" class="p-5 space-y-4"></div>
             </div>
         </div>
 
-        <!-- Shared Toast -->
-        <div id="app-toast"
-            class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[150] text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none">
-            <div id="toast-icon-container"
-                class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+        <!-- Toast Notification -->
+        <div id="app-toast" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[200] text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none">
+            <div id="toast-icon-container" class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                 <i id="toast-icon" data-lucide="check" class="w-5 h-5 text-white"></i>
             </div>
             <div class="flex-1 text-xs">
@@ -427,13 +250,12 @@
         </div>
     </div>
 
-    <!-- Firebase SDK & Logic -->
+    <!-- Firebase SDK & Shared Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyCBp1h2jHtfUG3dEokuI2NB-1L1Gke1q48",
             authDomain: "sai-yok-freelance.firebaseapp.com",
@@ -451,37 +273,41 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-
-        // --- Paths (Rule 1) ---
+        
         const getJobsPath = () => collection(db, 'artifacts', APP_ID, 'public', 'data', 'jobs');
-        const getUserProfilePath = (uid) => doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'settings');
+        const getProfilePath = (uid) => doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'settings');
 
-        // State
         window.currentUser = null;
         window.userProfile = null;
         window.JOBS = [];
         window.markers = {};
 
-        // --- Auth Implementation ---
+        // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             window.currentUser = user;
             const area = document.getElementById('user-header-area');
+            const roleBadge = document.getElementById('user-role-badge');
+
             if (user) {
-                // Fetch User Profile Settings (Persistent Name)
-                const profileSnap = await getDoc(getUserProfilePath(user.uid));
+                // Fetch Settings
+                const profileSnap = await getDoc(getProfilePath(user.uid));
                 if (profileSnap.exists()) {
                     window.userProfile = profileSnap.data();
+                    roleBadge.textContent = window.userProfile.role || 'User';
+                    roleBadge.classList.remove('hidden');
                 }
 
-                const nameDisplay = user.displayName || user.email || user.phoneNumber;
+                const photo = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || 'U'}&background=random`;
                 area.innerHTML = `
-                    <div class="flex items-center gap-2 bg-white/10 p-1 pl-3 rounded-full border border-white/10">
-                        <span class="text-[10px] font-bold max-w-[80px] truncate">${nameDisplay}</span>
-                        <img src="${user.photoURL || `https://ui-avatars.com/api/?name=${nameDisplay}&background=random`}" class="w-6 h-6 rounded-full border border-white/20">
-                        <button onclick="window.logout()" class="p-1 hover:text-rose-300 transition"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+                    <div class="flex items-center gap-1.5 p-0.5 rounded-full bg-white/10 border border-white/10 pr-2">
+                        <img src="${photo}" class="w-8 h-8 rounded-full border border-white/20">
+                        <button onclick="window.logout()" class="p-1.5 text-white/60 hover:text-rose-300 transition">
+                            <i data-lucide="log-out" class="w-4 h-4"></i>
+                        </button>
                     </div>`;
             } else {
                 area.innerHTML = `<button onclick="window.openAuthModal()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">เข้าสู่ระบบ</button>`;
+                roleBadge.classList.add('hidden');
             }
             lucide.createIcons({ nodes: [area] });
         });
@@ -490,8 +316,7 @@
             try {
                 await signInWithPopup(auth, new GoogleAuthProvider());
                 window.closeAuthModal();
-                window.showAppToast("สำเร็จ", "เข้าสู่ระบบด้วย Google เรียบร้อย");
-            } catch (e) { window.showAppToast("ผิดพลาด", "ไม่สามารถเข้าสู่ระบบได้", "error"); }
+            } catch (e) { window.showAppToast("ผิดพลาด", "เข้าสู่ระบบไม่ได้", "error"); }
         };
 
         window.handleEmailAuth = async (mode) => {
@@ -501,19 +326,18 @@
                 if (mode === 'signin') await signInWithEmailAndPassword(auth, email, pass);
                 else await createUserWithEmailAndPassword(auth, email, pass);
                 window.closeAuthModal();
-            } catch (e) { window.showAppToast("ผิดพลาด", "อีเมลหรือรหัสผ่านไม่ถูกต้อง", "error"); }
+            } catch (e) { window.showAppToast("ผิดพลาด", "ข้อมูลไม่ถูกต้อง", "error"); }
         };
 
         window.sendPhoneOTP = async () => {
             const phone = document.getElementById('auth-phone').value;
-            if (!phone.startsWith('0') || phone.length < 10) return window.showAppToast("เบอร์ไม่ถูก", "กรุณากรอกเบอร์มือถือจริง", "error");
+            const formatted = "+66" + phone.substring(1);
             try {
-                const formatted = "+66" + phone.substring(1);
                 window.recaptcha = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
                 window.confirmationResult = await signInWithPhoneNumber(auth, formatted, window.recaptcha);
                 document.getElementById('phone-input-group').classList.add('hidden');
                 document.getElementById('otp-input-group').classList.remove('hidden');
-                window.showAppToast("ส่งรหัสแล้ว", "โปรดตรวจสอบ SMS ของคุณ");
+                window.showAppToast("ส่งรหัสแล้ว", "โปรดตรวจสอบ SMS");
             } catch (e) { window.showAppToast("ผิดพลาด", "ส่ง SMS ไม่สำเร็จ", "error"); }
         };
 
@@ -521,12 +345,12 @@
             try {
                 await window.confirmationResult.confirm(document.getElementById('auth-otp').value);
                 window.closeAuthModal();
-            } catch (e) { window.showAppToast("รหัสผิด", "โปรดตรวจสอบ OTP อีกครั้ง", "error"); }
+            } catch (e) { window.showAppToast("รหัสผิด", "โปรดลองอีกครั้ง", "error"); }
         };
 
         window.logout = () => signOut(auth);
 
-        // --- Main Job & Map Logic ---
+        // --- JOBS & MAP ---
         window.initMap = () => {
             if (window.map) return;
             window.map = L.map('leaflet-map', { zoomControl: false }).setView([TEST_CENTER.lat, TEST_CENTER.lng], 10);
@@ -535,81 +359,91 @@
             L.control.zoom({ position: 'topright' }).addTo(window.map);
         };
 
-        onSnapshot(query(getJobsPath(), orderBy("createdAt", "desc")), (snapshot) => {
-            window.JOBS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            document.getElementById('db-status').textContent = "Live";
-            document.getElementById('db-status').className = "bg-emerald-400 text-indigo-900 text-[8px] font-black px-1.5 py-0.5 rounded uppercase";
+        onSnapshot(query(getJobsPath(), orderBy("createdAt", "desc")), (snap) => {
+            window.JOBS = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             window.filterAndRender();
-        }, (err) => {
-            if (err.code === 'permission-denied') document.getElementById('error-banner').classList.remove('hidden');
         });
 
-        // --- New Features Implementation ---
         window.openAddModal = () => {
             if (!window.currentUser) return window.openAuthModal();
             document.getElementById('add-modal-overlay').style.display = 'flex';
             window.initPickerMap();
             window.populateCategoryUI();
-
-            // Auto-fill logic
-            const contactInput = document.getElementById('job-contact-input');
-            const companyInput = document.getElementById('job-company-input');
-
-            // 1. Phone Auto-fill
+            
+            // Smart Auto-fill
+            const phoneInput = document.getElementById('job-contact-input');
+            const nameInput = document.getElementById('job-company-input');
+            
+            // 1. Phone Logic
             if (window.currentUser.phoneNumber) {
-                let p = window.currentUser.phoneNumber.replace('+66', '0');
-                contactInput.value = p;
+                phoneInput.value = window.currentUser.phoneNumber.replace('+66', '0');
+                phoneInput.disabled = true;
+                phoneInput.classList.add('bg-slate-50', 'text-slate-500');
             } else {
-                contactInput.value = "";
+                phoneInput.value = "";
+                phoneInput.disabled = false;
+                phoneInput.classList.remove('bg-slate-50', 'text-slate-500');
             }
 
-            // 2. Announcer Name Auto-fill (from profile)
+            // 2. Name Logic (Persistent)
             if (window.userProfile && window.userProfile.lastUsedName) {
-                companyInput.value = window.userProfile.lastUsedName;
+                nameInput.value = window.userProfile.lastUsedName;
             } else {
-                companyInput.value = "";
+                nameInput.value = window.currentUser.displayName || "";
+            }
+
+            // 3. Role Logic
+            if (window.userProfile && window.userProfile.role) {
+                window.selectRole(window.userProfile.role);
             }
         };
 
-        // Form Submit with Profile Update
-        document.getElementById('add-job-form').onsubmit = async (e) => {
+        window.add_job_submit = async (e) => {
             e.preventDefault();
             const fd = new FormData(e.target);
             const lat = parseFloat(fd.get('lat'));
             const lng = parseFloat(fd.get('lng'));
-            const companyName = fd.get('company');
+            const name = fd.get('company');
+            const role = fd.get('role');
 
-            // Geo Validation
-            const d = window.getDist(TEST_CENTER.lat, TEST_CENTER.lng, lat, lng);
-            if (d > SERVICE_RADIUS_KM) return window.showAppToast("นอกเขต", "ไม่สามารถลงประกาศนอกพื้นที่ให้บริการได้", "error");
+            if (window.getDist(TEST_CENTER.lat, TEST_CENTER.lng, lat, lng) > SERVICE_RADIUS_KM) {
+                return window.showAppToast("นอกพื้นที่", "ไม่สามารถลงประกาศนอกเขตให้บริการได้", "error");
+            }
 
             try {
-                window.showAppToast("กำลังบันทึก...", "กำลังส่งข้อมูลประกาศและอัปเดตโปรไฟล์");
-
-                // 1. Save Job
+                window.showAppToast("กำลังบันทึก...", "โปรดรอสักครู่");
+                
+                // Save Job
                 await addDoc(getJobsPath(), {
-                    title: fd.get('title'), company: companyName, location: fd.get('location'),
+                    title: fd.get('title'), company: name, location: fd.get('location'),
                     salary: fd.get('salary'), type: fd.get('type'), contact: fd.get('contact'),
-                    lat, lng, desc: fd.get('desc'),
+                    role: role, lat, lng, desc: fd.get('desc'),
                     expiryDate: new Date(Date.now() + parseInt(fd.get('duration')) * 24 * 60 * 60 * 1000).toISOString(),
                     createdAt: serverTimestamp(), createdBy: window.currentUser.uid
                 });
 
-                // 2. Save/Update Profile Name (Persistent)
-                await setDoc(getUserProfilePath(window.currentUser.uid), {
-                    lastUsedName: companyName,
+                // Update Profile (Persistent Name and Role)
+                await setDoc(getProfilePath(window.currentUser.uid), {
+                    lastUsedName: name,
+                    role: role,
                     updatedAt: serverTimestamp()
                 }, { merge: true });
 
-                // Update local state
-                window.userProfile = { lastUsedName: companyName };
+                // Sync local state
+                window.userProfile = { ...window.userProfile, lastUsedName: name, role: role };
 
                 window.closeAddModal(); e.target.reset();
-                window.showAppToast("ลงประกาศสำเร็จ!", "งานของคุณแสดงอยู่บนแผนที่แล้ว");
-            } catch (err) { window.showAppToast("ผิดพลาด", "ไม่สามารถบันทึกข้อมูลได้", "error"); }
+                window.showAppToast("สำเร็จ!", "ประกาศของคุณออนไลน์แล้ว");
+            } catch (err) { window.showAppToast("ผิดพลาด", "ไม่สามารถเชื่อมต่อฐานข้อมูลได้", "error"); }
         };
 
-        // --- Helper UIs ---
+        // UI BRIDGE
+        window.getDist = (lat1, lon1, lat2, lon2) => {
+            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        };
+
         window.initPickerMap = (lat, lng) => {
             const startLat = lat || TEST_CENTER.lat;
             const startLng = lng || TEST_CENTER.lng;
@@ -640,30 +474,48 @@
             }
             fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=th`)
                 .then(r => r.json()).then(data => {
-                    document.getElementById('display-address').textContent = data.display_name || "ระบุสำเร็จ";
+                    document.getElementById('display-address').textContent = data.display_name || "ระบุพิกัดสำเร็จ";
                     const sub = data.address.suburb || data.address.village || '';
                     if (sub) document.getElementById('form-location-input').value = sub;
                 });
         };
 
-        window.getDist = (lat1, lon1, lat2, lon2) => {
-            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        window.selectRole = (role) => {
+            document.getElementById('form-role-input').value = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.role === role));
+        };
+
+        window.selectDuration = (days) => {
+            document.getElementById('form-duration-input').value = days;
+            document.querySelectorAll('.duration-btn').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.days) === days));
+        };
+
+        window.openAuthModal = () => document.getElementById('auth-modal-overlay').style.display = 'flex';
+        window.closeAuthModal = () => document.getElementById('auth-modal-overlay').style.display = 'none';
+        window.closeModal = () => document.getElementById('modal-overlay').style.display = 'none';
+        window.closeAddModal = () => document.getElementById('add-modal-overlay').style.display = 'none';
+        window.centerToHome = () => window.map?.flyTo([TEST_CENTER.lat, TEST_CENTER.lng], 11);
+
+        window.showAppToast = (title, desc, type = 'success') => {
+            const toast = document.getElementById('app-toast');
+            toast.querySelector('#toast-title').textContent = title;
+            toast.querySelector('#toast-desc').textContent = desc;
+            toast.className = `fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[200] ${type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'} text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none`;
+            toast.classList.add('toast-active');
+            setTimeout(() => toast.classList.remove('toast-active'), 4000);
         };
 
         window.filterAndRender = () => {
             const q = document.getElementById('search-input').value.toLowerCase();
             const now = new Date();
-            window.filteredJobs = window.JOBS.filter(j => {
-                const expired = j.expiryDate ? new Date(j.expiryDate) < now : false;
-                if (expired) return false;
+            const jobs = window.JOBS.filter(j => {
+                if (j.expiryDate && new Date(j.expiryDate) < now) return false;
                 const d = window.getDist(TEST_CENTER.lat, TEST_CENTER.lng, j.lat, j.lng);
                 if (d > SERVICE_RADIUS_KM) return false;
                 return !q || j.title.toLowerCase().includes(q) || j.location.toLowerCase().includes(q);
             });
-            window.renderMapMarkers(window.filteredJobs);
-            window.renderJobList(window.filteredJobs);
+            window.renderMapMarkers(jobs);
+            window.renderJobList(jobs);
         };
 
         window.renderMapMarkers = (jobs) => {
@@ -688,9 +540,18 @@
             list.style.display = ''; document.getElementById('no-results').style.display = 'none';
             list.innerHTML = jobs.map(job => {
                 const c = window.TYPE_CONFIG[job.type] || window.TYPE_CONFIG.general;
+                const roleTag = job.role === 'worker' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700';
+                const roleLabel = job.role === 'worker' ? 'รับงาน' : 'จ้างงาน';
                 return `<div onclick="window.selectJob('${job.id}')" class="job-card rounded-xl border p-3 cursor-pointer fade-up ${window.activeJobId === job.id ? 'border-indigo-500 bg-indigo-50' : 'border-slate-100 bg-white'}">
-                    <div class="flex items-start justify-between gap-1 mb-1.5"><h3 class="font-bold text-xs text-slate-800 line-clamp-1">${job.title}</h3><span class="tag ${c.bg} ${c.text}"><i data-lucide="${c.icon}" class="w-2.5 h-2.5"></i></span></div>
-                    <div class="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">฿${job.salary} <span class="text-slate-300">|</span> <span class="text-slate-400 font-normal truncate">${job.location}</span></div>
+                    <div class="flex items-start justify-between gap-1 mb-1.5">
+                        <h3 class="font-bold text-xs text-slate-800 line-clamp-1">${job.title}</h3>
+                        <span class="tag ${c.bg} ${c.text}"><i data-lucide="${c.icon}" class="w-2.5 h-2.5"></i></span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px]">
+                        <span class="px-1.5 py-0.5 rounded font-bold ${roleTag}">${roleLabel}</span>
+                        <span class="font-bold text-emerald-600">฿${job.salary}</span>
+                        <span class="text-slate-400 truncate flex-1">${job.location}</span>
+                    </div>
                 </div>`;
             }).join('');
             lucide.createIcons({ nodes: [list] });
@@ -702,51 +563,32 @@
             if (!job || !window.map) return;
             window.map.flyTo([job.lat, job.lng], 15);
             document.getElementById('modal-title').textContent = job.title;
-            document.getElementById('modal-company').textContent = job.company;
+            document.getElementById('modal-company').textContent = job.company + (job.role === 'worker' ? ' (รับงาน)' : ' (จ้างงาน)');
             document.getElementById('modal-body').innerHTML = `
                 <div class="grid grid-cols-2 gap-2"><div class="bg-indigo-50 p-3 rounded-xl"><div class="text-[9px] font-bold text-indigo-400 uppercase">งบประมาณ</div><div class="text-sm font-bold text-indigo-700">฿${job.salary}</div></div><div class="bg-slate-50 p-3 rounded-xl"><div class="text-[9px] font-bold text-slate-400 uppercase">พื้นที่</div><div class="text-sm font-bold text-slate-700">${job.location}</div></div></div>
                 <div class="text-xs text-slate-600 leading-relaxed p-3 bg-white border rounded-xl whitespace-pre-line">${job.desc}</div>
-                <div class="bg-emerald-50 p-4 rounded-2xl flex items-center gap-3"><i data-lucide="phone" class="w-5 h-5 text-emerald-500"></i><div><div class="text-[9px] font-bold text-emerald-600 uppercase">ติดต่อ</div><div class="text-sm font-bold text-emerald-800">${job.contact}</div></div></div>
+                <div class="bg-emerald-50 p-4 rounded-2xl flex items-center gap-3"><i data-lucide="phone" class="w-5 h-5 text-emerald-500"></i><div><div class="text-[9px] font-bold text-emerald-600 uppercase">เบอร์ติดต่อยืนยันแล้ว</div><div class="text-sm font-bold text-emerald-800">${job.contact}</div></div></div>
             `;
             document.getElementById('modal-overlay').style.display = 'flex';
             lucide.createIcons({ nodes: [document.getElementById('modal-content')] });
             window.renderJobList(window.filteredJobs);
         };
 
-        window.showAppToast = (title, desc, type = 'success') => {
-            const toast = document.getElementById('app-toast');
-            toast.querySelector('#toast-title').textContent = title;
-            toast.querySelector('#toast-desc').textContent = desc;
-            toast.className = `fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[200] ${type === 'error' ? 'bg-rose-600' : 'bg-emerald-600'} text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none`;
-            toast.classList.add('toast-active');
-            setTimeout(() => toast.classList.remove('toast-active'), 4000);
-        };
-
-        // Bridge functions
-        window.openAuthModal = () => document.getElementById('auth-modal-overlay').style.display = 'flex';
-        window.closeAuthModal = () => document.getElementById('auth-modal-overlay').style.display = 'none';
-        window.closeModal = () => document.getElementById('modal-overlay').style.display = 'none';
-        window.closeAddModal = () => document.getElementById('add-modal-overlay').style.display = 'none';
-        window.centerToHome = () => window.map?.flyTo([TEST_CENTER.lat, TEST_CENTER.lng], 11);
-        window.selectDuration = (days) => {
-            document.getElementById('form-duration-input').value = days;
-            document.querySelectorAll('.duration-btn').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.days) === days));
-        };
         window.switchAuthTab = (tab) => {
             document.getElementById('email-section').classList.toggle('hidden', tab !== 'email');
             document.getElementById('phone-section').classList.toggle('hidden', tab !== 'phone');
             document.getElementById('tab-email').className = tab === 'email' ? 'flex-1 py-2 border-b-2 border-indigo-600 text-indigo-600' : 'flex-1 py-2 border-b-2 border-transparent text-slate-400';
             document.getElementById('tab-phone').className = tab === 'phone' ? 'flex-1 py-2 border-b-2 border-indigo-600 text-indigo-600' : 'flex-1 py-2 border-b-2 border-transparent text-slate-400';
         };
+
         window.checkAuthAndOpenPost = () => { if (!window.currentUser) window.openAuthModal(); else window.openAddModal(); };
-        window.getCurrentLocation = () => {
-            navigator.geolocation.getCurrentPosition(pos => window.initPickerMap(pos.coords.latitude, pos.coords.longitude), err => { }, { timeout: 10000 });
-        };
+        
         window.selectCategory = (key, refine) => {
             document.getElementById('form-category-input').value = key;
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.key === key));
             if (refine) window.analyzeAndRefine(false);
         };
+
         window.analyzeAndRefine = (auto) => {
             const titleIn = document.getElementById('job-title-input');
             const descIn = document.getElementById('job-desc-textarea');
@@ -787,9 +629,8 @@
         };
 
         window.addEventListener('DOMContentLoaded', () => { window.initMap(); lucide.createIcons(); });
-    </script>
-    <script>
-        document.getElementById('search-input').oninput = () => window.filterAndRender();
+        document.getElementById('add-job-form').onsubmit = window.add_job_submit;
+        document.getElementById('search-input').oninput = window.filterAndRender;
         document.getElementById('job-title-input').oninput = () => window.analyzeAndRefine(true);
         document.getElementById('form-location-input').oninput = () => window.analyzeAndRefine(false);
         document.getElementById('job-desc-textarea').oninput = (e) => e.target.dataset.isAiGenerated = "false";
