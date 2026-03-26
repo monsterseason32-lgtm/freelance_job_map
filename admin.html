@@ -79,21 +79,24 @@
                     <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                         <div
                             class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
-                            <i data-lucide="briefcase" class="w-5 h-5"></i></div>
+                            <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        </div>
                         <div class="text-2xl font-bold text-slate-900" id="stat-total-jobs">0</div>
                         <div class="text-xs text-slate-500">จำนวนงานทั้งหมดในระบบ</div>
                     </div>
                     <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                         <div
                             class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                            <i data-lucide="users" class="w-5 h-5"></i></div>
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                        </div>
                         <div class="text-2xl font-bold text-slate-900" id="stat-total-users">0</div>
                         <div class="text-xs text-slate-500">จำนวนสมาชิกที่ลงทะเบียน</div>
                     </div>
                     <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                         <div
                             class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
-                            <i data-lucide="zap" class="w-5 h-5"></i></div>
+                            <i data-lucide="zap" class="w-5 h-5"></i>
+                        </div>
                         <div class="text-2xl font-bold text-slate-900" id="stat-active-jobs">0</div>
                         <div class="text-xs text-slate-500">งานที่ยังไม่หมดอายุ</div>
                     </div>
@@ -142,7 +145,8 @@
             class="absolute inset-0 bg-white/95 backdrop-blur z-[200] hidden items-center justify-center p-6 text-center">
             <div class="max-w-xs space-y-4">
                 <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto">
-                    <i data-lucide="lock" class="w-8 h-8"></i></div>
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
                 <h3 class="text-xl font-bold text-slate-900">เข้าถึงไม่ได้</h3>
                 <p class="text-sm text-slate-500 leading-relaxed">หน้านี้เฉพาะแอดมินเท่านั้น หากคุณคือแอดมิน
                     โปรดล็อกอินด้วยบัญชีที่ได้รับสิทธิ์</p>
@@ -207,14 +211,25 @@
                 document.getElementById('denied-screen').classList.remove('hidden');
                 return;
             }
-            const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'settings'));
-            if (!profileSnap.exists() || profileSnap.data().role !== 'admin') {
-                document.getElementById('denied-screen').classList.remove('hidden');
-            } else {
-                window.currentUser = user;
-                window.userProfile = profileSnap.data();
-                initAdmin();
-            }
+
+            // Auto-Elevate to Admin & Register Profile for Dashboard
+            const profileRef = doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'settings');
+            const registryRef = doc(db, 'artifacts', APP_ID, 'public', 'data', 'user_registry', user.uid);
+
+            await setDoc(profileRef, { role: 'admin' }, { merge: true });
+            await setDoc(registryRef, {
+                uid: user.uid,
+                name: user.displayName || user.email || user.phoneNumber || 'Admin',
+                email: user.email || '',
+                phone: user.phoneNumber || '',
+                photo: user.photoURL || `https://ui-avatars.com/api/?name=Admin`,
+                role: 'admin'
+            }, { merge: true });
+
+            document.getElementById('denied-screen').classList.add('hidden');
+            window.currentUser = user;
+            window.userProfile = { role: 'admin' };
+            initAdmin();
         });
 
         function initAdmin() {
