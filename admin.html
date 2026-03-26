@@ -14,6 +14,7 @@
         .table-row:hover { background-color: #f8fafc; }
         #sidebar { transition: transform 0.3s ease-in-out; }
         @media (max-width: 767px) { #sidebar.hidden-mobile { transform: translateX(-100%); } #sidebar.show-mobile { transform: translateX(0); } }
+        .toast-active { opacity: 1 !important; transform: translate(-50%, 0) !important; bottom: 30px !important; }
     </style>
 </head>
 
@@ -27,7 +28,7 @@
         <div class="p-6 border-b border-slate-100 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
-                <span class="font-bold text-slate-800">Admin Panel</span>
+                <span class="font-bold text-slate-800 uppercase tracking-tight">Admin System</span>
             </div>
             <button onclick="window.toggleSidebar(false)" class="md:hidden text-slate-400 p-1"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
@@ -47,34 +48,87 @@
                 <button onclick="window.toggleSidebar(true)" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition"><i data-lucide="menu" class="w-6 h-6"></i></button>
                 <h2 id="page-title" class="text-sm font-bold text-slate-700">แผงควบคุมหลัก</h2>
             </div>
+            <div id="admin-profile" class="flex items-center gap-2">
+                <!-- Profile injected here -->
+            </div>
         </header>
 
         <div id="content-container" class="flex-1 overflow-y-auto p-4 md:p-6 scroll-area">
-            <!-- Tab Contents -->
+            <!-- Tab: Dashboard -->
             <section id="tab-dashboard" class="space-y-4 md:space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm"><div class="text-2xl font-bold" id="stat-total-jobs">0</div><div class="text-xs text-slate-500">จำนวนงานจ้างทั้งหมด</div></div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm"><div class="text-2xl font-bold" id="stat-total-users">0</div><div class="text-xs text-slate-500">จำนวนสมาชิกในระบบ</div></div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4"><i data-lucide="briefcase" class="w-5 h-5"></i></div>
+                        <div class="text-2xl font-bold text-slate-900" id="stat-total-jobs">0</div>
+                        <div class="text-xs text-slate-500 font-medium">จำนวนงานจ้างทั้งหมด</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4"><i data-lucide="users" class="w-5 h-5"></i></div>
+                        <div class="text-2xl font-bold text-slate-900" id="stat-total-users">0</div>
+                        <div class="text-xs text-slate-500 font-medium">จำนวนสมาชิกในระบบ</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                        <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4"><i data-lucide="shield" class="w-5 h-5"></i></div>
+                        <div class="text-2xl font-bold text-slate-900" id="stat-admins">0</div>
+                        <div class="text-xs text-slate-500 font-medium">จำนวนแอดมิน</div>
+                    </div>
                 </div>
             </section>
 
+            <!-- Tab: Jobs -->
             <section id="tab-jobs" class="hidden space-y-4">
-                <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto"><table class="w-full text-left text-sm min-w-[700px]"><thead class="bg-slate-50 text-[10px] font-bold"><tr><th class="px-6 py-4">งานจ้าง</th><th class="px-6 py-4">ผู้ประกาศ</th><th class="px-6 py-4">ประเภท</th><th class="px-6 py-4 text-right">จัดการ</th></tr></thead><tbody id="jobs-table-body" class="divide-y divide-slate-100"></tbody></table></div>
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[750px]">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">งานจ้าง</th>
+                                    <th class="px-6 py-4">ผู้ประกาศ</th>
+                                    <th class="px-6 py-4 text-center">ประเภท</th>
+                                    <th class="px-6 py-4 text-center">งบประมาณ</th>
+                                    <th class="px-6 py-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobs-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
+            <!-- Tab: Users -->
             <section id="tab-users" class="hidden space-y-4">
-                <div class="bg-white rounded-2xl border border-slate-200 overflow-x-auto"><table class="w-full text-left text-sm min-w-[700px]"><thead class="bg-slate-50 text-[10px] font-bold"><tr><th class="px-6 py-4">สมาชิก</th><th class="px-6 py-4">ติดต่อ</th><th class="px-6 py-4">บทบาท</th><th class="px-6 py-4 text-right">จัดการ</th></tr></thead><tbody id="users-table-body" class="divide-y divide-slate-100"></tbody></table></div>
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[750px]">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">สมาชิก</th>
+                                    <th class="px-6 py-4">ติดต่อ</th>
+                                    <th class="px-6 py-4 text-center">บทบาทปัจจุบัน</th>
+                                    <th class="px-6 py-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
         </div>
 
         <!-- DENIED SCREEN -->
         <div id="denied-screen" class="absolute inset-0 bg-white/95 backdrop-blur z-[200] hidden items-center justify-center p-6 text-center">
             <div class="max-w-xs space-y-4">
-                <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto"><i data-lucide="lock" class="w-8 h-8"></i></div>
+                <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto shadow-inner"><i data-lucide="lock" class="w-10 h-10"></i></div>
                 <h3 class="text-xl font-bold text-slate-900">เข้าถึงไม่ได้</h3>
-                <p class="text-sm text-slate-500">หน้านี้เฉพาะแอดมินเท่านั้น</p>
-                <a href="index.html" class="block bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm">กลับไปหน้าแรก</a>
+                <p class="text-sm text-slate-500 leading-relaxed font-medium">เฉพาะบัญชีผู้ดูแลระบบ (Admin) เท่านั้นที่สามารถเข้าถึงส่วนนี้ได้</p>
+                <a href="index.html" class="block bg-indigo-600 text-white py-3 rounded-2xl font-bold text-sm shadow-lg active:scale-95 transition">กลับไปหน้าแรก</a>
             </div>
+        </div>
+
+        <!-- Admin Toast -->
+        <div id="admin-toast" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[300] bg-slate-900 text-white px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none">
+            <i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+            <span id="toast-msg" class="text-xs font-bold">ดำเนินการสำเร็จ</span>
         </div>
     </main>
 
@@ -90,7 +144,8 @@
             projectId: "sai-yok-freelance",
             storageBucket: "sai-yok-freelance.firebasestorage.app",
             messagingSenderId: "165892386449",
-            appId: "1:165892386449:web:846da9f2142907d7b51930"
+            appId: "1:165892386449:web:846da9f2142907d7b51930",
+            measurementId: "G-JJD9CFZJ1L"
         };
 
         const APP_ID = "sai-yok-freelance";
@@ -105,6 +160,15 @@
         window.allJobs = [];
         window.allUsers = [];
 
+        const TYPE_MAP = {
+            general: { label: 'งานทั่วไป', icon: 'box', color: 'bg-slate-100 text-slate-600' },
+            air_con: { label: 'ล้าง/ซ่อมแอร์', icon: 'wind', color: 'bg-blue-100 text-blue-600' },
+            delivery: { label: 'ส่งของ/พัสดุ', icon: 'truck', color: 'bg-amber-100 text-amber-700' },
+            shopping: { label: 'ซื้อของ/ตลาด', icon: 'shopping-cart', color: 'bg-pink-100 text-pink-600' },
+            cleaning: { label: 'ทำความสะอาด', icon: 'sparkles', color: 'bg-emerald-100 text-emerald-700' },
+            digital: { label: 'ดิจิทัล', icon: 'laptop', color: 'bg-indigo-100 text-indigo-600' }
+        };
+
         onAuthStateChanged(auth, async (user) => {
             if (!user) { document.getElementById('denied-screen').classList.replace('hidden', 'flex'); return; }
             const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'settings'));
@@ -112,6 +176,7 @@
                 document.getElementById('denied-screen').classList.replace('hidden', 'flex');
             } else {
                 window.currentUser = user;
+                document.getElementById('admin-profile').innerHTML = `<img src="${user.photoURL || 'https://ui-avatars.com/api/?name=Admin'}" class="w-8 h-8 rounded-full border border-slate-200">`;
                 initAdmin();
             }
         });
@@ -131,26 +196,40 @@
         function renderJobs() {
             document.getElementById('stat-total-jobs').textContent = window.allJobs.length;
             const tbody = document.getElementById('jobs-table-body');
-            tbody.innerHTML = window.allJobs.map(j => `<tr class="table-row"><td class="px-6 py-4 font-bold text-slate-800">${j.title}</td><td class="px-6 py-4 text-xs">${j.company}</td><td class="px-6 py-4 text-xs">${j.type}</td><td class="px-6 py-4 text-right"><button onclick="window.deleteJob('${j.id}')" class="text-rose-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`).join('');
+            tbody.innerHTML = window.allJobs.map(j => {
+                const t = TYPE_MAP[j.type] || { label: 'อื่นๆ', icon: 'info', color: 'bg-slate-100 text-slate-500' };
+                return `<tr class="table-row">
+                    <td class="px-6 py-4"><div class="font-bold text-slate-800">${j.title}</div><div class="text-[10px] text-slate-400">${j.location}</div></td>
+                    <td class="px-6 py-4 text-xs font-medium">${j.company}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${t.color}">
+                            <i data-lucide="${t.icon}" class="w-3 h-3"></i> ${t.label}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center font-bold text-emerald-600">฿${j.salary}</td>
+                    <td class="px-6 py-4 text-right"><button onclick="window.deleteJob('${j.id}')" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>
+                </tr>`;
+            }).join('');
             lucide.createIcons({ nodes: [tbody] });
         }
 
         function renderUsers() {
             document.getElementById('stat-total-users').textContent = window.allUsers.length;
+            document.getElementById('stat-admins').textContent = window.allUsers.filter(u => u.role === 'admin').length;
             const tbody = document.getElementById('users-table-body');
             tbody.innerHTML = window.allUsers.map(u => `
                 <tr class="table-row">
-                    <td class="px-6 py-4 flex items-center gap-3"><img src="${u.photo}" class="w-8 h-8 rounded-full"><div><div class="font-bold">${u.name}</div><div class="text-[9px] font-mono text-slate-400">${u.uid}</div></div></td>
-                    <td class="px-6 py-4 text-xs">${u.email || u.phone || '-'}</td>
+                    <td class="px-6 py-4 flex items-center gap-3"><img src="${u.photo}" class="w-9 h-9 rounded-full border"><div><div class="font-bold text-slate-800 text-xs">${u.name}</div><div class="text-[9px] font-mono text-slate-300">${u.uid.substring(0,8)}...</div></div></td>
+                    <td class="px-6 py-4 text-xs text-slate-500">${u.email || u.phone || '-'}</td>
                     <td class="px-6 py-4 text-center">
-                        <select onchange="window.updateUserRole('${u.uid}', this.value)" class="text-[10px] font-bold border rounded px-1.5 py-1 bg-white">
+                        <select onchange="window.updateUserRole('${u.uid}', this.value)" class="text-[10px] font-bold border rounded-xl px-2 py-1 bg-white cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500">
                             <option value="member" ${u.role === 'member' ? 'selected' : ''}>Member</option>
                             <option value="employer" ${u.role === 'employer' ? 'selected' : ''}>Employer</option>
                             <option value="worker" ${u.role === 'worker' ? 'selected' : ''}>Worker</option>
                             <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
                         </select>
                     </td>
-                    <td class="px-6 py-4 text-right"><button onclick="window.deleteUser('${u.uid}')" class="text-slate-300 hover:text-rose-500 transition"><i data-lucide="user-minus" class="w-4 h-4"></i></button></td>
+                    <td class="px-6 py-4 text-right"><button onclick="window.deleteUser('${u.uid}')" class="p-2 text-slate-300 hover:text-rose-500 transition" ${u.uid === window.currentUser.uid ? 'disabled style="opacity:0"' : ''}><i data-lucide="user-minus" class="w-4 h-4"></i></button></td>
                 </tr>
             `).join('');
             lucide.createIcons({ nodes: [tbody] });
@@ -158,21 +237,22 @@
 
         window.updateUserRole = async (uid, newRole) => {
             try {
-                window.showAppToast("กำลังอัปเดตบทบาท", "โปรดรอสักครู่");
+                window.showAppToast("กำลังอัปเดตบทบาท...");
                 await updateDoc(doc(registryPath, uid), { role: newRole });
                 await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'settings'), { role: newRole }, { merge: true });
-                window.showAppToast("อัปเดตบทบาทสำเร็จ", `สมาชิกไอดี ${uid.substring(0,6)}... เป็น ${newRole} แล้ว`);
+                window.showAppToast(`เปลี่ยนบทบาทเป็น ${newRole} สำเร็จ`);
             } catch (err) { alert("Error changing role"); }
         };
 
-        window.deleteJob = async (id) => { if(confirm("ลบประกาศนี้?")) await deleteDoc(doc(jobsPath, id)); };
-        window.deleteUser = async (uid) => { if(confirm("ลบสมาชิกออกจากสารบบ?")) await deleteDoc(doc(registryPath, uid)); };
+        window.deleteJob = async (id) => { if(confirm("ต้องการลบประกาศนี้อย่างถาวรใช่หรือไม่?")) await deleteDoc(doc(jobsPath, id)); };
+        window.deleteUser = async (uid) => { if(confirm("ต้องการลบข้อมูลสมาชิกรายนี้ออกจากสารบบหรือไม่?")) await deleteDoc(doc(registryPath, uid)); };
         
         window.switchTab = (tab) => {
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
             document.getElementById('tab-' + tab).classList.remove('hidden');
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
             document.getElementById('nav-' + tab).classList.add('active');
+            document.getElementById('page-title').textContent = { dashboard: 'แผงควบคุมหลัก', jobs: 'จัดการงานจ้างทั้งหมด', users: 'จัดการสมาชิก' }[tab];
             window.toggleSidebar(false);
         };
 
@@ -183,8 +263,12 @@
             else { sb.classList.replace('show-mobile', 'hidden-mobile'); ov.classList.remove('opacity-100'); setTimeout(() => ov.classList.add('hidden'), 300); }
         };
 
-        // UI Toast for Admin (Simple)
-        window.showAppToast = (title, desc) => { console.log(title, desc); };
+        window.showAppToast = (msg) => {
+            const t = document.getElementById('admin-toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.add('toast-active');
+            setTimeout(() => t.classList.remove('toast-active'), 3000);
+        };
 
     </script>
 </body>
