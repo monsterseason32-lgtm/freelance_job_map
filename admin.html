@@ -23,17 +23,49 @@
         .table-row:hover {
             background-color: #f8fafc;
         }
+
+        /* Mobile Sidebar Animation */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        @media (max-width: 767px) {
+            #sidebar.hidden-mobile {
+                transform: translateX(-100%);
+            }
+            #sidebar.show-mobile {
+                transform: translateX(0);
+            }
+        }
+
+        /* Scrollbar for tables on mobile */
+        .table-container::-webkit-scrollbar {
+            height: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
 <body class="h-full bg-slate-50 flex overflow-hidden">
+    
+    <!-- Mobile Backdrop -->
+    <div id="sidebar-overlay" onclick="window.toggleSidebar(false)" class="fixed inset-0 bg-black/50 z-[40] hidden md:hidden opacity-0 transition-opacity duration-300"></div>
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col shrink-0">
-        <div class="p-6 border-b border-slate-100 flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-                <i data-lucide="shield-check" class="w-5 h-5"></i>
+    <aside id="sidebar" class="fixed md:relative w-64 h-full bg-white border-r border-slate-200 flex flex-col shrink-0 z-[50] hidden-mobile md:translate-x-0 transition-transform duration-300">
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-slate-800">Admin Panel</span>
             </div>
-            <span class="font-bold text-slate-800">Admin Panel</span>
+            <button onclick="window.toggleSidebar(false)" class="md:hidden text-slate-400 p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
         </div>
         <nav class="flex-1 p-4 space-y-1">
             <button onclick="window.switchTab('dashboard')" id="nav-dashboard"
@@ -58,31 +90,33 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-hidden relative">
+    <main class="flex-1 flex flex-col overflow-hidden relative w-full">
         <!-- Top Nav -->
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
-            <div class="flex items-center gap-4">
-                <button class="md:hidden text-slate-500"><i data-lucide="menu" class="w-6 h-6"></i></button>
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6 shrink-0">
+            <div class="flex items-center gap-3">
+                <button onclick="window.toggleSidebar(true)" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
                 <h2 id="page-title" class="text-sm font-bold text-slate-700">แผงควบคุมหลัก</h2>
             </div>
             <div id="admin-info" class="flex items-center gap-3">
-                <!-- Profile will be injected -->
+                <!-- Profile Avatar will be here -->
             </div>
         </header>
 
         <!-- Content Area -->
-        <div id="content-container" class="flex-1 overflow-y-auto p-6 scroll-area">
+        <div id="content-container" class="flex-1 overflow-y-auto p-4 md:p-6 scroll-area">
 
             <!-- Tab: Dashboard -->
-            <section id="tab-dashboard" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section id="tab-dashboard" class="space-y-4 md:space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                         <div
                             class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
                             <i data-lucide="briefcase" class="w-5 h-5"></i>
                         </div>
                         <div class="text-2xl font-bold text-slate-900" id="stat-total-jobs">0</div>
-                        <div class="text-xs text-slate-500">จำนวนงานทั้งหมดในระบบ</div>
+                        <div class="text-xs text-slate-500 font-medium">จำนวนงานจ้างทั้งหมด</div>
                     </div>
                     <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                         <div
@@ -90,51 +124,55 @@
                             <i data-lucide="users" class="w-5 h-5"></i>
                         </div>
                         <div class="text-2xl font-bold text-slate-900" id="stat-total-users">0</div>
-                        <div class="text-xs text-slate-500">จำนวนสมาชิกที่ลงทะเบียน</div>
+                        <div class="text-xs text-slate-500 font-medium">จำนวนสมาชิกในระบบ</div>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm sm:col-span-2 lg:col-span-1">
                         <div
                             class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
                             <i data-lucide="zap" class="w-5 h-5"></i>
                         </div>
                         <div class="text-2xl font-bold text-slate-900" id="stat-active-jobs">0</div>
-                        <div class="text-xs text-slate-500">งานที่ยังไม่หมดอายุ</div>
+                        <div class="text-xs text-slate-500 font-medium">งานจ้างที่กำลังออนไลน์</div>
                     </div>
                 </div>
             </section>
 
             <!-- Tab: Jobs -->
             <section id="tab-jobs" class="hidden space-y-4">
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left text-sm border-collapse">
-                        <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
-                            <tr>
-                                <th class="px-6 py-4">งานจ้าง</th>
-                                <th class="px-6 py-4">ผู้ประกาศ</th>
-                                <th class="px-6 py-4 text-center">ประเภท</th>
-                                <th class="px-6 py-4 text-center">งบประมาณ</th>
-                                <th class="px-6 py-4 text-right">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="jobs-table-body" class="divide-y divide-slate-100"></tbody>
-                    </table>
+                <div class="bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="table-container overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse min-w-[600px]">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">งานจ้าง</th>
+                                    <th class="px-6 py-4">ผู้ประกาศ</th>
+                                    <th class="px-6 py-4 text-center">ประเภท</th>
+                                    <th class="px-6 py-4 text-center">งบประมาณ</th>
+                                    <th class="px-6 py-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobs-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
             <!-- Tab: Users -->
             <section id="tab-users" class="hidden space-y-4">
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                    <table class="w-full text-left text-sm border-collapse">
-                        <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
-                            <tr>
-                                <th class="px-6 py-4">สมาชิก</th>
-                                <th class="px-6 py-4">ติดต่อ</th>
-                                <th class="px-6 py-4 text-center">บทบาท</th>
-                                <th class="px-6 py-4 text-right">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body" class="divide-y divide-slate-100"></tbody>
-                    </table>
+                <div class="bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="table-container overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse min-w-[600px]">
+                            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="px-6 py-4">สมาชิก</th>
+                                    <th class="px-6 py-4">ติดต่อ</th>
+                                    <th class="px-6 py-4 text-center">บทบาท</th>
+                                    <th class="px-6 py-4 text-right">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -158,19 +196,25 @@
 
     <!-- Modal: Edit Job -->
     <div id="edit-job-modal" class="fixed inset-0 bg-black/50 z-[300] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 animate-fade-up">
             <h3 class="text-lg font-bold mb-4">แก้ไขรายละเอียดงาน</h3>
             <form id="edit-job-form" class="space-y-4">
                 <input type="hidden" id="edit-job-id">
-                <input type="text" id="edit-job-title"
-                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500">
-                <textarea id="edit-job-desc" rows="4"
-                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none"></textarea>
-                <div class="flex gap-2">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-400 uppercase">หัวข้อจ้างงาน</label>
+                    <input type="text" id="edit-job-title"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-slate-400 uppercase">รายละเอียด</label>
+                    <textarea id="edit-job-desc" rows="4"
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 outline-none"></textarea>
+                </div>
+                <div class="flex gap-2 pt-2">
                     <button type="button" onclick="window.closeEditJobModal()"
                         class="flex-1 py-2.5 rounded-xl border border-slate-200 font-bold text-sm">ยกเลิก</button>
                     <button type="submit"
-                        class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm">บันทึกการเปลี่ยนแปลง</button>
+                        class="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm transition active:scale-95">บันทึก</button>
                 </div>
             </form>
         </div>
@@ -179,7 +223,7 @@
     <!-- Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, getDoc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -201,7 +245,6 @@
         const registryPath = collection(db, 'artifacts', APP_ID, 'public', 'data', 'user_registry');
 
         window.currentUser = null;
-        window.userProfile = null;
         window.allJobs = [];
         window.allUsers = [];
 
@@ -209,14 +252,15 @@
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 document.getElementById('denied-screen').classList.remove('hidden');
+                document.getElementById('denied-screen').classList.add('flex');
                 return;
             }
             const profileSnap = await getDoc(doc(db, 'artifacts', APP_ID, 'users', user.uid, 'profile', 'settings'));
             if (!profileSnap.exists() || profileSnap.data().role !== 'admin') {
                 document.getElementById('denied-screen').classList.remove('hidden');
+                document.getElementById('denied-screen').classList.add('flex');
             } else {
                 window.currentUser = user;
-                window.userProfile = profileSnap.data();
                 initAdmin();
             }
         });
@@ -253,15 +297,15 @@
             tbody.innerHTML = window.allJobs.map(job => `
                 <tr class="table-row">
                     <td class="px-6 py-4">
-                        <div class="font-bold text-slate-800">${job.title}</div>
-                        <div class="text-[10px] text-slate-400 truncate max-w-[200px]">${job.location}</div>
+                        <div class="font-bold text-slate-800">${job.title || 'ไม่มีชื่อหัวข้อ'}</div>
+                        <div class="text-[10px] text-slate-400 truncate max-w-[200px]">${job.location || 'ไม่ระบุพื้นที่'}</div>
                     </td>
-                    <td class="px-6 py-4 text-xs font-medium text-slate-600">${job.company}</td>
-                    <td class="px-6 py-4 text-center"><span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded-md text-[10px] font-bold">${job.type}</span></td>
-                    <td class="px-6 py-4 text-center text-emerald-600 font-bold text-xs">฿${job.salary}</td>
-                    <td class="px-6 py-4 text-right space-x-2">
-                        <button onclick="window.openEditJob('${job.id}')" class="text-slate-400 hover:text-indigo-600 p-1"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                        <button onclick="window.deleteJob('${job.id}')" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <td class="px-6 py-4 text-xs font-medium text-slate-600">${job.company || 'นิรนาม'}</td>
+                    <td class="px-6 py-4 text-center"><span class="px-2 py-1 bg-indigo-50 text-indigo-600 rounded-md text-[10px] font-bold uppercase">${job.type || 'ทั่วไป'}</span></td>
+                    <td class="px-6 py-4 text-center text-emerald-600 font-bold text-xs">฿${job.salary || '0'}</td>
+                    <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+                        <button onclick="window.openEditJob('${job.id}')" class="text-slate-400 hover:text-indigo-600 p-1 transition"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                        <button onclick="window.deleteJob('${job.id}')" class="text-slate-400 hover:text-rose-600 p-1 transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -273,13 +317,13 @@
             tbody.innerHTML = window.allUsers.map(user => `
                 <tr class="table-row">
                     <td class="px-6 py-4 flex items-center gap-3">
-                        <img src="${user.photo}" class="w-8 h-8 rounded-full border border-slate-200">
-                        <div>
-                            <div class="font-bold text-slate-800">${user.name}</div>
-                            <div class="text-[10px] text-slate-400 font-mono">${user.uid}</div>
+                        <img src="${user.photo || 'https://ui-avatars.com/api/?name=U'}" class="w-8 h-8 rounded-full border border-slate-200 shrink-0">
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-800 truncate max-w-[120px]">${user.name || 'ไม่มีชื่อ'} ${user.uid === window.currentUser.uid ? '(You)' : ''}</div>
+                            <div class="text-[9px] text-slate-400 font-mono truncate max-w-[100px]">${user.uid}</div>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-xs text-slate-500">${user.email || user.phone || '-'}</td>
+                    <td class="px-6 py-4 text-xs text-slate-500 truncate max-w-[150px]">${user.email || user.phone || '-'}</td>
                     <td class="px-6 py-4 text-center">
                         <select onchange="window.updateUserRole('${user.uid}', this.value)" class="text-[10px] font-bold border rounded-md px-2 py-1 outline-none bg-slate-50 cursor-pointer">
                             <option value="member" ${user.role === 'member' ? 'selected' : ''}>Member</option>
@@ -289,7 +333,9 @@
                         </select>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="window.deleteUser('${user.uid}')" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="user-minus" class="w-4 h-4"></i></button>
+                        <button onclick="window.deleteUser('${user.uid}')" class="text-slate-400 hover:text-rose-600 p-1 transition" ${user.uid === window.currentUser.uid ? 'disabled style="opacity:0.2"' : ''}>
+                            <i data-lucide="user-minus" class="w-4 h-4"></i>
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -306,8 +352,8 @@
             const job = window.allJobs.find(j => j.id === id);
             if (!job) return;
             document.getElementById('edit-job-id').value = id;
-            document.getElementById('edit-job-title').value = job.title;
-            document.getElementById('edit-job-desc').value = job.desc;
+            document.getElementById('edit-job-title').value = job.title || '';
+            document.getElementById('edit-job-desc').value = job.desc || '';
             document.getElementById('edit-job-modal').classList.remove('hidden');
             document.getElementById('edit-job-modal').classList.add('flex');
         };
@@ -322,19 +368,23 @@
             const id = document.getElementById('edit-job-id').value;
             const title = document.getElementById('edit-job-title').value;
             const desc = document.getElementById('edit-job-desc').value;
-            await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'jobs', id), { title, desc });
-            window.closeEditJobModal();
+            try {
+                await updateDoc(doc(db, 'artifacts', APP_ID, 'public', 'data', 'jobs', id), { title, desc });
+                window.closeEditJobModal();
+            } catch (err) { alert("Error updating job"); }
         };
 
         window.updateUserRole = async (uid, newRole) => {
-            // Update Public Registry
-            await updateDoc(doc(registryPath, uid), { role: newRole });
-            // Update Private Settings (This might need permission in rules)
-            await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'settings'), { role: newRole }, { merge: true });
+            try {
+                // Update Public Registry
+                await updateDoc(doc(registryPath, uid), { role: newRole });
+                // Update Private Settings (May fail if rules don't permit admin writing to users subcol)
+                await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'settings'), { role: newRole }, { merge: true });
+            } catch (err) { console.error("Error updating role:", err); }
         };
 
         window.deleteUser = async (uid) => {
-            if (!confirm("ลบข้อมูลสมาชิกรายนี้ออกจากสารบบหรือไม่? (บัญชีผู้ใช้จะยังคงอยู่แต่ข้อมูลโปรไฟล์จะหายไป)")) return;
+            if (!confirm("ลบข้อมูลสมาชิกรายนี้ออกจากระบบหรือไม่?")) return;
             await deleteDoc(doc(registryPath, uid));
         };
 
@@ -344,6 +394,23 @@
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
             document.getElementById('nav-' + tab).classList.add('active');
             document.getElementById('page-title').textContent = { dashboard: 'แผงควบคุมหลัก', jobs: 'จัดการงานจ้างทั้งหมด', users: 'จัดการสมาชิก' }[tab];
+            if (window.innerWidth < 768) window.toggleSidebar(false);
+        };
+
+        window.toggleSidebar = (show) => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (show) {
+                sidebar.classList.remove('hidden-mobile');
+                sidebar.classList.add('show-mobile');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            } else {
+                sidebar.classList.add('hidden-mobile');
+                sidebar.classList.remove('show-mobile');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
         };
 
     </script>
