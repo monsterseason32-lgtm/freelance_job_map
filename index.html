@@ -40,19 +40,18 @@
             <div class="min-w-0 flex-1">
                 <h1 class="text-sm md:text-lg font-bold tracking-tight leading-none truncate uppercase">Local Freelance</h1>
                 <div class="flex items-center gap-2 mt-1">
-                    <span id="db-status" class="bg-emerald-400 text-indigo-900 text-[8px] font-black px-1.5 py-0.5 rounded uppercase leading-none tracking-tighter">Live</span>
+                    <span id="db-status" class="bg-emerald-400 text-indigo-900 text-[8px] font-black px-1.5 py-0.5 rounded uppercase leading-none tracking-tighter">Connecting</span>
                     <span id="ui-role-display" class="hidden bg-indigo-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase leading-none border border-indigo-400/50"></span>
                 </div>
             </div>
             
-            <!-- User Area -->
+            <!-- User Area (Profile Image Only) -->
             <div id="user-header-area" class="flex items-center gap-2">
-                <!-- Login or Profile Avatar -->
                 <button onclick="window.openAuthModal()" class="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition">เข้าสู่ระบบ</button>
             </div>
         </header>
 
-        <!-- Tabs Navigation -->
+        <!-- Tabs -->
         <div class="px-3 py-2 bg-white border-b border-slate-200 shrink-0 relative z-10 shadow-sm">
             <div class="max-w-5xl mx-auto flex gap-2 overflow-x-auto scroll-area">
                 <button onclick="window.switchMainTab('explore')" id="tab-explore" class="tab-btn active px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2">
@@ -73,7 +72,7 @@
                 </div>
             </div>
 
-            <div id="job-panel" class="flex-[3] md:w-96 md:flex-none bg-white flex flex-col overflow-hidden">
+            <div id="job-panel" class="flex-[3] md:w-96 md:flex-none bg-white flex flex-col overflow-hidden shadow-xl">
                 <div class="px-3 py-2 md:px-4 md:py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/30">
                     <div class="relative flex-1 mr-2">
                         <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"></i>
@@ -99,7 +98,7 @@
             <div class="max-w-3xl mx-auto space-y-6">
                 <div>
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <i data-lucide="briefcase" class="w-4 h-4"></i> งานที่คุณลงประกาศ
+                        <i data-lucide="briefcase" class="w-4 h-4"></i> รายการที่คุณลงประกาศ
                     </h3>
                     <div id="my-posted-list" class="space-y-3 text-sm"></div>
                 </div>
@@ -113,7 +112,7 @@
             </div>
         </div>
 
-        <!-- Modal: Add Job -->
+        <!-- Add Modal -->
         <div id="add-modal-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] hidden items-center justify-center p-3">
             <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[95%] flex flex-col overflow-hidden animate-fade-up">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
@@ -123,7 +122,7 @@
                 <form id="add-job-form" class="p-5 overflow-y-auto scroll-area space-y-5">
                     <div id="picker-map"></div>
                     
-                    <!-- ส่วนแสดงตำแหน่งที่เลือก (ID: display-address MUST EXIST) -->
+                    <!-- ส่วนแสดงตำแหน่งที่เลือก (DISPLAY ADDRESS BOX) - ห้ามลบ! -->
                     <div id="location-status-box" class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl transition-all">
                         <div class="flex items-start gap-2.5">
                             <i data-lucide="map-pin" class="w-4 h-4 text-indigo-600 mt-0.5"></i>
@@ -171,7 +170,7 @@
             </div>
         </div>
 
-        <!-- Modal: Details -->
+        <!-- Detail Modal -->
         <div id="modal-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
             <div id="modal-content" class="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90%] overflow-y-auto scroll-area">
                 <div id="modal-header" class="p-5 border-b border-slate-100 flex items-start justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
@@ -182,14 +181,14 @@
                             <span id="modal-company" class="text-xs font-semibold text-slate-600"></span>
                         </div>
                     </div>
-                    <button onclick="window.closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+                    <button onclick="window.closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 shrink-0 transition"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
                 </div>
                 <div id="modal-body" class="p-5 space-y-4 text-sm"></div>
                 <div id="modal-footer" class="p-5 border-t border-slate-50 bg-slate-50/50"></div>
             </div>
         </div>
 
-        <!-- Shared Toast -->
+        <!-- Toast -->
         <div id="app-toast" class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[200] text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none">
             <div id="toast-icon-container" class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0"><i id="toast-icon" data-lucide="check" class="w-5 h-5 text-white"></i></div>
             <div class="flex-1 text-xs"><div id="toast-title" class="font-bold leading-tight text-sm"></div><div id="toast-desc" class="opacity-90"></div></div>
@@ -225,16 +224,57 @@
         const getProfilePath = (uid) => doc(db, 'artifacts', APP_ID, 'users', uid, 'profile', 'settings');
         const getRegistryPath = () => collection(db, 'artifacts', APP_ID, 'public', 'data', 'user_registry');
 
-        // Global state for module
+        // Initial Globals
         window.currentUser = null;
         window.userProfile = null;
         window.JOBS = [];
         window.markers = {};
 
-        // --- Core Functions (Must be attached to window immediately) ---
-        window.filterAndRender = () => {
-            const qInput = document.getElementById('search-input');
-            const q = qInput ? qInput.value.toLowerCase() : "";
+        // --- Core Functions Registration (FIRST TO PREVENT ERROR) ---
+        window.getDist = (lat1, lon1, lat2, lon2) => {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+        };
+
+        window.updatePickerCoords = function(lat, lng) {
+            const latEl = document.getElementById('form-lat');
+            const lngEl = document.getElementById('form-lng');
+            if(latEl) latEl.value = lat;
+            if(lngEl) lngEl.value = lng;
+            
+            const dist = window.getDist(TEST_CENTER.lat, TEST_CENTER.lng, lat, lng);
+            const box = document.getElementById('location-status-box');
+            const title = document.getElementById('location-status-title');
+            
+            if (box && title) {
+                if (dist > SERVICE_RADIUS_KM) {
+                    box.className = "bg-rose-50 border border-rose-200 p-3 rounded-xl transition-all";
+                    title.textContent = `นอกพื้นที่ (${dist.toFixed(1)} กม.)`;
+                } else {
+                    box.className = "bg-indigo-50 border border-indigo-100 p-3 rounded-xl transition-all";
+                    title.textContent = "ตำแหน่งงาน";
+                }
+            }
+
+            const displayEl = document.getElementById('display-address');
+            if (displayEl) {
+                displayEl.textContent = "กำลังค้นหาที่อยู่...";
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=th`)
+                    .then(r => r.json()).then(data => {
+                        displayEl.textContent = data.display_name || "ระบุตำแหน่งแล้ว";
+                        const sub = data.address.suburb || data.address.village || '';
+                        const locInput = document.getElementById('form-location-input');
+                        if (sub && locInput && !locInput.value) locInput.value = sub;
+                    }).catch(() => { displayEl.textContent = "ระบุตำแหน่งแล้ว"; });
+            }
+        };
+
+        window.filterAndRender = function() {
+            const qEl = document.getElementById('search-input');
+            const q = qEl ? qEl.value.toLowerCase() : "";
             const now = new Date();
             const filtered = window.JOBS.filter(j => {
                 if (j.status && j.status !== 'pending') return false; 
@@ -247,7 +287,7 @@
             window.renderList(filtered);
         };
 
-        window.switchMainTab = (tab) => {
+        window.switchMainTab = function(tab) {
             const explore = document.getElementById('section-explore');
             const myJobs = document.getElementById('section-my-jobs');
             const btnExplore = document.getElementById('tab-explore');
@@ -262,7 +302,21 @@
             if (tab === 'my-jobs') window.renderMyJobs();
         };
 
-        // --- AUTH OBSERVER ---
+        window.initPickerMap = function(lat, lng) {
+            const startLat = lat || TEST_CENTER.lat; const startLng = lng || TEST_CENTER.lng;
+            if (!window.pickerMap) {
+                const mapEl = document.getElementById('picker-map');
+                if(!mapEl) return;
+                window.pickerMap = L.map('picker-map', { zoomControl: false }).setView([startLat, startLng], 12);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(window.pickerMap);
+                window.pickerMarker = L.marker([startLat, startLng], { draggable: true }).addTo(window.pickerMap);
+                window.pickerMarker.on('dragend', () => { const pos = window.pickerMarker.getLatLng(); window.updatePickerCoords(pos.lat, pos.lng); });
+                window.pickerMap.on('click', (e) => { window.pickerMarker.setLatLng(e.latlng); window.updatePickerCoords(e.latlng.lat, e.latlng.lng); });
+            } else { window.pickerMap.setView([startLat, startLng], 12); setTimeout(() => window.pickerMap.invalidateSize(), 200); }
+            window.updatePickerCoords(startLat, startLng);
+        };
+
+        // --- Auth Observer ---
         onAuthStateChanged(auth, async (user) => {
             window.currentUser = user;
             const area = document.getElementById('user-header-area');
@@ -295,16 +349,15 @@
             window.filterAndRender();
         });
 
-        // --- DATABASE SYNC ---
+        // --- Database Actions ---
         onSnapshot(query(getJobsPath(), orderBy("createdAt", "desc")), (snap) => {
             window.JOBS = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const dbStatus = document.getElementById('db-status');
-            if(dbStatus) dbStatus.textContent = "Live";
+            const statusBadge = document.getElementById('db-status');
+            if(statusBadge) statusBadge.textContent = "Live";
             window.filterAndRender();
             window.renderMyJobs();
         });
 
-        // --- ACTIONS ---
         window.add_job_submit = async (e) => {
             e.preventDefault();
             const fd = new FormData(e.target);
@@ -320,7 +373,6 @@
                 
                 let currentRole = window.userProfile?.role || 'member';
                 let nextRole = (currentRole === 'member') ? 'employer' : currentRole;
-
                 await setDoc(getProfilePath(window.currentUser.uid), { lastUsedName: fd.get('company'), role: nextRole }, { merge: true });
                 await updateDoc(doc(getRegistryPath(), window.currentUser.uid), { role: nextRole });
 
@@ -335,7 +387,7 @@
             const userRole = window.userProfile?.role || 'member';
 
             if (action === 'accept' && userRole !== 'worker' && userRole !== 'admin') {
-                window.showAppToast("สิทธิ์ไม่ถูกต้อง", "เฉพาะบทบาท 'ผู้รับงาน' เท่านั้นที่รับงานได้", "error");
+                window.showAppToast("สิทธิ์ไม่ถูกต้อง", "เฉพาะบทบาท 'ผู้รับงาน' เท่านั้นจึงจะรับงานได้", "error");
                 return;
             }
             
@@ -348,7 +400,7 @@
             } catch (e) { window.showAppToast("ผิดพลาด", "จัดการสถานะไม่ได้", "error"); }
         };
 
-        // --- RENDERERS ---
+        // --- Rendering Logic ---
         window.renderMarkers = (jobs) => {
             if (!window.map) return;
             Object.keys(window.markers).forEach(id => { if (!jobs.find(j => j.id === id)) { window.map.removeLayer(window.markers[id].marker); delete window.markers[id]; } });
@@ -389,65 +441,66 @@
                     <div><div class="font-bold text-sm truncate max-w-[200px]">${j.title}</div><div class="text-[9px] px-1.5 py-0.5 rounded bg-slate-100 uppercase font-bold text-slate-500 inline-block mt-1">${j.status || 'pending'}</div></div>
                     <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300"></i>
                 </div>`;
-            
             const postedEl = document.getElementById('my-posted-list');
             const acceptedEl = document.getElementById('my-accepted-list');
             const countEl = document.getElementById('my-jobs-count');
-
             if(postedEl) postedEl.innerHTML = myPosted.length ? myPosted.map(renderItem).join('') : '<p class="text-xs text-slate-400 italic">คุณยังไม่มีประกาศงาน</p>';
             if(acceptedEl) acceptedEl.innerHTML = myAccepted.length ? myAccepted.map(renderItem).join('') : '<p class="text-xs text-slate-400 italic">คุณยังไม่ได้รับงานใดๆ</p>';
             if(countEl) { countEl.textContent = myPosted.length + myAccepted.length; countEl.classList.toggle('hidden', (myPosted.length + myAccepted.length) === 0); }
             lucide.createIcons({ nodes: [document.getElementById('section-my-jobs')] });
         };
 
-        // --- MAP & PICKER ---
-        window.initMap = () => {
-            const mapEl = document.getElementById('leaflet-map');
-            if (!mapEl || window.map) return;
-            window.map = L.map('leaflet-map', { zoomControl: false }).setView([TEST_CENTER.lat, TEST_CENTER.lng], 10);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(window.map);
-            L.circle([TEST_CENTER.lat, TEST_CENTER.lng], { color: '#6366f1', fillOpacity: 0.04, radius: SERVICE_RADIUS_KM * 1000 }).addTo(window.map);
-            L.control.zoom({ position: 'topright' }).addTo(window.map);
+        window.selectPost = function(id) {
+            const j = window.JOBS.find(x => x.id === id);
+            if (!j) return;
+            if (window.map) window.map.flyTo([j.lat, j.lng], 15);
+            document.getElementById('modal-title').textContent = j.title;
+            document.getElementById('modal-company').textContent = j.company;
+            const isOwner = window.currentUser?.uid === j.createdBy;
+            const isWorker = window.currentUser?.uid === j.workerId;
+            const userRole = window.userProfile?.role || 'member';
+            const showContact = (isOwner || isWorker || userRole === 'admin') && j.status !== 'pending';
+
+            document.getElementById('modal-body').innerHTML = `
+                <div class="grid grid-cols-2 gap-2"><div class="bg-indigo-50 p-3 rounded-xl"><div class="text-[9px] font-bold text-indigo-400 uppercase tracking-wider">งบประมาณ</div><div class="text-sm font-bold text-indigo-700">฿${j.salary}</div></div><div class="bg-slate-50 p-3 rounded-xl"><div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">พื้นที่</div><div class="text-sm font-bold text-slate-700">${j.location}</div></div></div>
+                <div class="text-xs text-slate-600 leading-relaxed p-4 bg-slate-50 rounded-2xl whitespace-pre-line">${j.desc}</div>
+                ${showContact ? `<div class="bg-emerald-50 p-4 rounded-2xl flex items-center gap-3"><i data-lucide="phone" class="w-5 h-5 text-emerald-500"></i><div><div class="text-[9px] font-bold text-emerald-600 uppercase tracking-tight">เบอร์ติดต่อ</div><div class="text-sm font-bold text-emerald-800">${j.contact}</div></div></div>` : '<p class="text-[10px] text-center text-slate-400 italic p-3 bg-white border border-dashed rounded-xl">เฉพาะแอดมินหรือผู้รับงานที่ยืนยันแล้วเท่านั้นที่จะเห็นเบอร์ติดต่อ</p>'}
+            `;
+
+            let footerHtml = "";
+            if (!window.currentUser) footerHtml = `<button onclick="window.openAuthModal()" class="w-full py-3.5 bg-indigo-600 text-white rounded-xl font-bold text-xs shadow-lg">เข้าสู่ระบบเพื่อรับงาน</button>`;
+            else if (j.status === 'pending' || !j.status) {
+                if (isOwner) footerHtml = `<p class="text-xs text-center text-slate-400 font-medium py-2">กำลังรอผู้รับงานมารับงาน...</p>`;
+                else if (userRole === 'worker' || userRole === 'admin') footerHtml = `<button onclick="window.handleJobAction('${j.id}', 'accept')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-bold text-xs shadow-lg active:scale-95 transition">ยืนยันรับงานนี้</button>`;
+                else footerHtml = `<div class="bg-rose-50 border border-rose-100 p-3 rounded-xl text-center"><p class="text-[10px] text-rose-600 font-bold mb-1 uppercase tracking-tighter">ต้องเป็นบทบาทผู้รับงาน (Worker)</p><p class="text-[11px] text-rose-700 leading-tight">โปรดส่งเอกสารกับแอดมินเพื่อขอเปลี่ยนบทบาทให้สามารถรับงานได้</p></div>`;
+            } else if (j.status === 'in_progress') {
+                if (isWorker || userRole === 'admin') footerHtml = `<button onclick="window.handleJobAction('${j.id}', 'deliver')" class="w-full py-3.5 bg-indigo-600 text-white rounded-xl font-bold text-xs shadow-lg">แจ้งส่งมอบงาน (เสร็จสิ้น)</button>`;
+                else if (isOwner) footerHtml = `<div class="text-center text-xs text-indigo-600 font-bold p-2 bg-indigo-50 rounded-xl">ดำเนินการโดย: ${j.workerName}</div>`;
+            } else if (j.status === 'delivered' && (isOwner || userRole === 'admin')) footerHtml = `<button onclick="window.handleJobAction('${j.id}', 'confirm')" class="w-full py-3.5 bg-emerald-600 text-white rounded-xl font-bold text-xs shadow-lg">ยืนยันงานสำเร็จ</button>`;
+            else if (j.status === 'completed') footerHtml = `<div class="text-center text-emerald-600 font-bold text-xs p-2 bg-emerald-50 rounded-xl">งานนี้สำเร็จสมบูรณ์ ✔️</div>`;
+
+            const footer = document.getElementById('modal-footer');
+            if(footer) { footer.innerHTML = footerHtml; document.getElementById('modal-overlay').style.display = 'flex'; }
+            lucide.createIcons();
         };
 
-        window.initPickerMap = (lat, lng) => {
-            const startLat = lat || TEST_CENTER.lat; const startLng = lng || TEST_CENTER.lng;
-            if (!window.pickerMap) {
-                const mapEl = document.getElementById('picker-map');
-                if(!mapEl) return;
-                window.pickerMap = L.map('picker-map', { zoomControl: false }).setView([startLat, startLng], 12);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(window.pickerMap);
-                window.pickerMarker = L.marker([startLat, startLng], { draggable: true }).addTo(window.pickerMap);
-                window.pickerMarker.on('dragend', () => { const pos = window.pickerMarker.getLatLng(); window.updatePickerCoords(pos.lat, pos.lng); });
-                window.pickerMap.on('click', (e) => { window.pickerMarker.setLatLng(e.latlng); window.updatePickerCoords(e.latlng.lat, e.latlng.lng); });
-            } else { window.pickerMap.setView([startLat, startLng], 12); setTimeout(() => window.pickerMap.invalidateSize(), 200); }
-            window.updatePickerCoords(startLat, startLng);
-        };
-
-        // UI Helpers
-        window.selectDuration = (d) => { 
-            const input = document.getElementById('form-duration-input');
-            if(input) input.value = d; 
-            document.querySelectorAll('.duration-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.days) === d)); 
-        };
-        window.getDist = (lat1, lon1, lat2, lon2) => { const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180; const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2); return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))); };
-        
-        // Window Bridge
-        window.loginWithGoogle = window.loginWithGoogle;
-        window.logout = window.logout;
+        // UI Bridges
         window.openAuthModal = () => document.getElementById('auth-modal-overlay').style.display = 'flex';
         window.closeAuthModal = () => document.getElementById('auth-modal-overlay').style.display = 'none';
         window.closeModal = () => document.getElementById('modal-overlay').style.display = 'none';
         window.closeAddModal = () => document.getElementById('add-modal-overlay').style.display = 'none';
         window.centerToHome = () => window.map?.flyTo([TEST_CENTER.lat, TEST_CENTER.lng], 11);
-        window.checkAuthAndOpenPost = () => { if (!window.currentUser) window.openAuthModal(); else { document.getElementById('add-modal-overlay').style.display = 'flex'; window.initPickerMap(); window.populateCategoryUI(); } };
+        window.checkAuthAndOpenPost = () => { if (!window.currentUser) window.openAuthModal(); else window.openAddModal(); };
+        window.selectDuration = (d) => { const input = document.getElementById('form-duration-input'); if(input) input.value = d; document.querySelectorAll('.duration-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.days) === d)); };
+        window.loginWithGoogle = window.loginWithGoogle;
+        window.logout = window.logout;
 
-        // Start
+        // Init
         window.addEventListener('DOMContentLoaded', () => { window.initMap(); lucide.createIcons(); });
         document.getElementById('add-job-form').onsubmit = window.add_job_submit;
         document.getElementById('search-input').oninput = window.filterAndRender;
         document.getElementById('modal-overlay').onclick = (e) => { if (e.target === e.currentTarget) window.closeModal(); };
-
+        
         window.TYPE_CONFIG = {
             general: { icon: "box", bg: "bg-slate-100", text: "text-slate-700", hex: "#64748b", label: "ทั่วไป" },
             air_con: { icon: "wind", bg: "bg-blue-100", text: "text-blue-700", hex: "#3b82f6", label: "ล้างแอร์" },
@@ -462,11 +515,7 @@
             grid.innerHTML = Object.keys(window.TYPE_CONFIG).map(k => `<button type="button" onclick="window.selectCategory('${k}')" class="category-btn p-2 rounded-xl flex flex-col items-center justify-center gap-1 bg-white" data-key="${k}"><i data-lucide="${window.TYPE_CONFIG[k].icon}" class="w-4 h-4"></i><span class="text-[9px] font-bold">${window.TYPE_CONFIG[k].label}</span></button>`).join('');
             lucide.createIcons({ nodes: [grid] });
         };
-        window.selectCategory = (k) => { 
-            const input = document.getElementById('form-category-input');
-            if(input) input.value = k; 
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.toggle('active', b.dataset.key === k)); 
-        };
+        window.selectCategory = (k) => { const input = document.getElementById('form-category-input'); if(input) input.value = k; document.querySelectorAll('.category-btn').forEach(b => b.classList.toggle('active', b.dataset.key === k)); };
     </script>
 </body>
 </html>
