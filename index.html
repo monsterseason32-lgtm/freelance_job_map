@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="th" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ศูนย์รวมงานจ้าง & ฟรีแลนซ์ - ไทรโยค-ทองผาภูมิ</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <style>
+        * {
+            font-family: 'Kanit', sans-serif;
+        }
+
+        .job-card {
+            transition: all 0.2s ease;
+        }
+
+        .job-card:active {
+            transform: scale(0.98);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            gap: 3px;
+        }
+
+        .scroll-area::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .scroll-area::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        #leaflet-map {
+            z-index: 1;
+            height: 100%;
+            width: 100%;
+            background: #f1f5f9;
+        }
+
+        #picker-map {
+            height: 220px;
+            width: 100%;
+            border-radius: 12px;
+            z-index: 1;
+            border: 1px solid #e2e8f0;
+        }
+
+        .leaflet-popup-content {
+            font-family: 'Kanit', sans-serif !important;
+            font-size: 13px;
+        }
+
+        .job-marker {
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        input,
+        select,
+        textarea {
+            appearance: none;
+        }
+
+        .loading-pulse {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: .5;
+            }
+        }
+
+        .suggest-badge {
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .category-btn,
+        .duration-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #f1f5f9;
+        }
+
+        .category-btn.active,
+        .duration-btn.active {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+            color: #4338ca;
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .custom-select-wrapper {
+            position: relative;
+        }
+
+        .custom-select-wrapper::after {
+            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .toast-active {
+            opacity: 1 !important;
+            transform: translate(-50%, 0) !important;
+            bottom: 40px !important;
+        }
+    </style>
+</head>
+
+<body class="h-full bg-slate-50 text-slate-800 overflow-hidden flex flex-col">
+    <div id="app" class="h-full w-full flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header
+            class="bg-indigo-700 text-white px-3 py-2 md:px-4 md:py-3 flex items-center gap-2 md:gap-3 shrink-0 shadow-lg relative z-20">
+            <div
+                class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <i data-lucide="map" class="w-5 h-5 md:w-6 md:h-6 text-white"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <h1 class="text-sm md:text-lg font-bold tracking-tight leading-none truncate">Local Freelance:
+                        ไทรโยค - ทองผาภูมิ</h1>
+                    <span
+                        class="bg-emerald-400 text-indigo-900 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter">Test
+                        Phase</span>
+                </div>
+                <p class="hidden sm:block text-[10px] text-indigo-100 opacity-80 mt-1">พื้นที่ทดสอบ: ไทรโยค, ทองผาภูมิ
+                    และระแวกใกล้เคียง</p>
+            </div>
+            <div class="ml-auto">
+                <button onclick="openAddModal()"
+                    class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-semibold flex items-center gap-1.5 transition shadow-sm active:scale-95">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 md:w-4 md:h-4"></i> ลงประกาศ
+                </button>
+            </div>
+        </header>
+
+        <!-- Search & Filters -->
+        <div class="px-3 py-2 md:px-4 md:py-3 bg-white border-b border-slate-200 shrink-0 relative z-10 shadow-sm">
+            <div class="max-w-5xl mx-auto flex flex-col gap-2">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <i data-lucide="search"
+                            class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"></i>
+                        <input id="search-input" type="text" placeholder="ค้นหางานในเขตไทรโยค - ทองผาภูมิ..."
+                            class="w-full pl-8 pr-3 py-2 md:py-2.5 rounded-lg md:rounded-xl border border-slate-200 bg-slate-50 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                    </div>
+                    <button id="sort-btn"
+                        class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 transition flex items-center gap-1.5 text-xs font-medium">
+                        <i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i> <span
+                            class="hidden sm:inline">เรียงตามงบ</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="custom-select-wrapper flex-1">
+                        <select id="filter-type"
+                            class="w-full px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 text-[10px] md:text-xs cursor-pointer focus:outline-none pr-10">
+                            <option value="all">ทุกหมวดหมู่</option>
+                        </select>
+                    </div>
+                    <div
+                        class="shrink-0 bg-indigo-50 border border-indigo-100 px-2 py-1.5 rounded-lg flex items-center gap-1.5">
+                        <i data-lucide="crosshair" class="w-3 h-3 text-indigo-600"></i>
+                        <span id="radius-badge" class="text-[9px] font-bold text-indigo-700">รัศมี 80 กม.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+            <div id="map-container" class="relative flex-[2] md:flex-1 overflow-hidden min-h-[250px] md:min-h-0">
+                <div id="leaflet-map"></div>
+                <div class="absolute bottom-4 right-4 z-[10]">
+                    <button onclick="centerToHome()"
+                        class="bg-white p-2.5 rounded-full shadow-lg border border-slate-200 text-indigo-600 active:scale-90 transition"
+                        title="กลับไปที่จุดศูนย์กลาง">
+                        <i data-lucide="home" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Job List Panel -->
+            <div id="job-panel"
+                class="flex-[3] md:w-96 md:flex-none bg-white border-t md:border-t-0 md:border-l border-slate-200 flex flex-col overflow-hidden">
+                <div
+                    class="px-3 py-2 md:px-4 md:py-3 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/30">
+                    <h2 class="text-xs md:text-sm font-bold text-slate-700">งานจ้างในพื้นที่</h2>
+                    <span id="job-count-badge"
+                        class="bg-indigo-100 text-indigo-700 text-[9px] md:text-[10px] font-bold px-1.5 py-0.5 rounded"></span>
+                </div>
+                <div id="job-list" class="flex-1 overflow-y-auto scroll-area p-2 md:p-3 space-y-2 md:space-y-3"></div>
+                <div id="no-results"
+                    class="hidden flex-1 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
+                    <i data-lucide="map-pin-off" class="w-10 h-10 mb-2 opacity-30"></i>
+                    <p class="text-xs font-semibold">ไม่พบงานในรัศมีที่กำหนด</p>
+                    <p class="text-[10px] mt-1">ระบบกำลังเปิดทดสอบเฉพาะเขตไทรโยคและทองผาภูมิ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Details -->
+        <div id="modal-overlay"
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-3 md:p-4">
+            <div id="modal-content"
+                class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-lg w-full max-h-[90%] overflow-y-auto scroll-area">
+                <div id="modal-header"
+                    class="p-4 md:p-6 border-b border-slate-100 flex items-start justify-between sticky top-0 bg-white z-10">
+                    <div class="min-w-0 pr-2">
+                        <h3 id="modal-title" class="text-base md:text-xl font-bold text-slate-900 leading-tight"></h3>
+                        <div class="flex items-center flex-wrap gap-1.5 mt-1.5">
+                            <span id="modal-company" class="text-[11px] md:text-sm font-medium text-slate-600"></span>
+                            <span id="modal-tag-container" class="flex"></span>
+                        </div>
+                    </div>
+                    <button onclick="closeModal()"
+                        class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 shrink-0 transition">
+                        <i data-lucide="x" class="w-4 h-4 md:w-5 h-5 text-slate-500"></i>
+                    </button>
+                </div>
+                <div id="modal-body" class="p-4 md:p-6 space-y-4 md:space-y-6"></div>
+            </div>
+        </div>
+
+        <!-- Modal: Add Job -->
+        <div id="add-modal-overlay"
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] hidden items-center justify-center p-3 md:p-4">
+            <div
+                class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full max-h-[95%] flex flex-col overflow-hidden animate-fade-up">
+                <div class="p-4 md:p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+                    <h3 class="text-base md:text-xl font-bold text-slate-900">ลงประกาศงานใหม่</h3>
+                    <button onclick="closeAddModal()"
+                        class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition">
+                        <i data-lucide="x" class="w-4 h-4 md:w-5 h-5 text-slate-500"></i>
+                    </button>
+                </div>
+                <form id="add-job-form" class="p-4 md:p-6 overflow-y-auto scroll-area space-y-5">
+
+                    <!-- Smart Location Picker -->
+                    <div class="space-y-3">
+                        <label
+                            class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                            <span>ระบุตำแหน่งงาน (จำกัดเฉพาะเขตไทรโยค - ทองผาภูมิ)</span>
+                            <button id="get-geo-btn" type="button" onclick="getCurrentLocation()"
+                                class="text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition font-bold group">
+                                <i data-lucide="crosshair" class="w-3 h-3 group-active:scale-90"></i> ใช้ตำแหน่งปัจจุบัน
+                            </button>
+                        </label>
+                        <div id="picker-map"></div>
+
+                        <div id="location-status-box"
+                            class="bg-indigo-50 border border-indigo-100 p-3 rounded-xl transition-all duration-300">
+                            <div class="flex items-start gap-2.5">
+                                <div id="location-status-icon" class="mt-0.5 shrink-0"><i data-lucide="map-pin"
+                                        class="w-4 h-4 text-indigo-600"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <div id="location-status-title"
+                                        class="text-[10px] font-bold text-indigo-400 uppercase leading-none mb-1">
+                                        ตำแหน่งที่เลือก</div>
+                                    <div id="display-address"
+                                        class="text-xs md:text-sm text-indigo-900 font-medium leading-tight">
+                                        โปรดเลือกตำแหน่งบนแผนที่</div>
+                                    <div id="display-coords" class="text-[9px] text-indigo-400 font-mono mt-1">Lat: -,
+                                        Lng: -</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="geo-tip" class="hidden text-[10px] text-amber-600 font-medium">* หากค้างนานเกินไป
+                            คุณสามารถจิ้มเลือกจุดบนแผนที่ได้ทันที</p>
+                        <input type="hidden" name="lat" id="form-lat" required>
+                        <input type="hidden" name="lng" id="form-lng" required>
+                        <input type="hidden" name="full_address" id="form-address">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label
+                                class="text-[10px] md:text-xs font-bold text-slate-500 uppercase">หัวข้อจ้างงาน</label>
+                            <input type="text" id="job-title-input" name="title" required
+                                placeholder="เช่น หาคนล้างแอร์ 8 เครื่อง"
+                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-500 uppercase">ชื่อผู้จ้าง</label>
+                            <input type="text" name="company" required placeholder="ชื่อคุณหรือร้านค้า"
+                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="space-y-2">
+                        <label
+                            class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center">
+                            เลือกหมวดหมู่ที่ใช่ <span id="category-suggest-label"
+                                class="hidden text-emerald-600 font-bold ml-2 suggest-badge">(AI เลือกให้แล้ว!)</span>
+                        </label>
+                        <input type="hidden" name="type" id="form-category-input" required value="general">
+                        <div id="form-category-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-500 uppercase">งบประมาณ
+                                (฿)</label>
+                            <input type="text" name="salary" required placeholder="เช่น 1,500"
+                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] md:text-xs font-bold text-indigo-600 uppercase">ช่องทางติดต่อ
+                                (Line ID / โทร)</label>
+                            <input type="text" name="contact" required placeholder="เบอร์โทรหรือไอดีไลน์"
+                                class="w-full px-3 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50/50 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[10px] md:text-xs font-bold text-slate-500 uppercase">ย่าน /
+                                เขตพื้นที่</label>
+                            <input type="text" id="form-location-input" name="location" required
+                                placeholder="เช่น ไทรโยคน้อย, ทองผาภูมิ"
+                                class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label
+                                class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">ระยะเวลาเปิดประกาศ</label>
+                            <input type="hidden" name="duration" id="form-duration-input" value="3">
+                            <div id="duration-selection" class="flex flex-wrap gap-2">
+                                <button type="button" onclick="selectDuration(1)"
+                                    class="duration-btn flex-1 py-2.5 px-3 rounded-xl bg-white text-xs font-bold"
+                                    data-days="1">1 วัน</button>
+                                <button type="button" onclick="selectDuration(3)"
+                                    class="duration-btn flex-1 py-2.5 px-3 rounded-xl bg-white text-xs font-bold active"
+                                    data-days="3">3 วัน</button>
+                                <button type="button" onclick="selectDuration(7)"
+                                    class="duration-btn flex-1 py-2.5 px-3 rounded-xl bg-white text-xs font-bold"
+                                    data-days="7">7 วัน</button>
+                                <button type="button" onclick="selectDuration(30)"
+                                    class="duration-btn flex-1 py-2.5 px-3 rounded-xl bg-white text-xs font-bold"
+                                    data-days="30">30 วัน</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="text-[10px] md:text-xs font-bold text-slate-500 uppercase">รายละเอียดงาน (AI
+                            ร่างเบื้องต้น)</label>
+                        <textarea id="job-desc-textarea" name="desc" rows="3" required
+                            placeholder="ระบุสิ่งที่ต้องการจ้าง..."
+                            class="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-300"></textarea>
+                    </div>
+
+                    <button id="submit-post-btn" type="submit"
+                        class="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition shadow-lg active:scale-95 text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="check" class="w-5 h-5"></i> ยืนยันการลงประกาศ
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="app-toast"
+            class="fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[100] text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none">
+            <div id="toast-icon-container"
+                class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                <i id="toast-icon" data-lucide="check" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <div id="toast-title" class="text-sm font-bold leading-tight">สำเร็จ!</div>
+                <div id="toast-desc" class="text-[10px] opacity-90">ดำเนินการเรียบร้อยแล้ว</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const TEST_CENTER = { lat: 14.292976, lng: 99.003232 };
+        const SERVICE_RADIUS_KM = 80;
+
+        const TYPE_CONFIG = {
+            general: { icon: "box", bg: "bg-slate-100", text: "text-slate-700", hex: "#64748b", label: "งานทั่วไป", keywords: ["ยกของ", "ย้ายหอ", "ย้ายบ้าน", "ขนของ", "ช่วยงาน"], template: (t, l) => `ต้องการคนช่วย${t} ในย่าน ${l} ทำงานเสร็จรับเงินทันทีครับ` },
+            air_con: { icon: "wind", bg: "bg-blue-100", text: "text-blue-700", hex: "#3b82f6", label: "ล้าง/ซ่อมแอร์", keywords: ["ล้างแอร์", "ซ่อมแอร์", "เติมน้ำยา", "ติดตั้งแอร์"], template: (t, l) => `หาคนช่วย${t} ขอคนที่อยู่ในพื้นที่ ${l} หรือใกล้เคียง เดินทางมาสะดวกครับ` },
+            delivery: { icon: "truck", bg: "bg-amber-100", text: "text-amber-700", hex: "#f59e0b", label: "ส่งของ/พัสดุ", keywords: ["ส่งของ", "พัสดุ", "แมสเซนเจอร์", "เอกสาร", "ของกิน", "อาหาร"], template: (t, l) => `หาคนช่วย${t} ต้นทางคือ ${l} ปลายทางคุยกันในแชทครับ ด่วน!` },
+            shopping: { icon: "shopping-cart", bg: "bg-pink-100", text: "text-pink-700", hex: "#ec4899", label: "ซื้อของ/ตลาด", keywords: ["ซื้อของ", "ตลาด", "เซเว่น", "โลตัส", "บิ๊กซี", "ฝากซื้อ"], template: (t, l) => `ฝากซื้อของหน่อยครับ อยู่แถวๆ ${l} เดี๋ยวโอนเงินค่าของและค่าจ้างให้ตามตกลงครับ` },
+            cleaning: { icon: "sparkles", bg: "bg-emerald-100", text: "text-emerald-700", hex: "#10b981", label: "ทำความสะอาด", keywords: ["ทำความสะอาด", "แม่บ้าน", "กวาด", "ถู", "ล้างจาน", "รีดผ้า"], template: (t, l) => `หาแม่บ้านมาช่วย${t} ที่พื้นที่ ${l} งานไม่ยากครับ เน้นความสะอาดเรียบร้อย` },
+            room_hunt: { icon: "home", bg: "bg-indigo-100", text: "text-indigo-700", hex: "#6366f1", label: "หาห้อง/หอพัก", keywords: ["หาห้อง", "เช่าคอนโด", "หอพัก", "หาที่พัก"], template: (t, l) => `สนใจ${t} ในเขต ${l} ใครมีห้องว่างหรือแนะนำ ติดต่อมาได้เลยครับ` },
+            travel_buddy: { icon: "users", bg: "bg-violet-100", text: "text-violet-700", hex: "#8b5cf6", label: "เพื่อนเที่ยว", keywords: ["เพื่อนเที่ยว", "หาเพื่อน", "ไปทริป", "กินข้าว", "ดูหนัง"], template: (t, l) => `หา${t} แถว ${l} มาจอยกันได้ครับ เน้นคุยเก่ง นิสัยดี` },
+            homework: { icon: "book-open", bg: "bg-rose-100", text: "text-rose-700", hex: "#f43f5e", label: "การบ้าน/ติว", keywords: ["การบ้าน", "รายงาน", "ติว", "สอนพิเศษ", "แปลภาษา", "พิมพ์งาน"], template: (t, l) => `หาคนช่วย${t} สะดวกคุยรายละเอียดเพิ่มในแชทครับ` },
+            transport: { icon: "car", bg: "bg-cyan-100", text: "text-cyan-700", hex: "#06b6d4", label: "รับ-ส่ง/ขับรถ", keywords: ["ไปรับ", "ไปส่ง", "สนามบิน", "ขับรถ", "รับลูก"], template: (t, l) => `หาคนช่วย${t} ย่าน ${l} มีรถมาเองหรือไม่มีคุยกันได้ครับ` },
+            maintenance: { icon: "wrench", bg: "bg-orange-100", text: "text-orange-700", hex: "#f97316", label: "งานช่างอื่นๆ", keywords: ["ช่างไฟ", "ช่างประปา", "ก๊อกน้ำ", "ซ่อมบำรุง"], template: (t, l) => `หาช่างมาช่วย${t} ที่ ${l} อาการประมาณไหนคุยกันหน้างานครับ` },
+            digital: { icon: "laptop", bg: "bg-sky-100", text: "text-sky-700", hex: "#0ea5e9", label: "ดิจิทัล/กราฟิก", keywords: ["โลโก้", "กราฟิก", "ตัดต่อ", "วิดีโอ", "เว็บไซต์"], template: (t, l) => `หาฟรีแลนซ์มาช่วย${t} ขอดูพอร์ตและประเมินราคาก่อนครับ` }
+        };
+
+        const setExpiry = (days) => new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        let JOBS = [
+            { id: 1, title: "จ้างล้างแอร์ 2 เครื่อง แถวน้ำตกไทรโยคน้อย", company: "คุณเก่ง", location: "ไทรโยคน้อย", salary: "1,200", type: "air_con", lat: 14.2380, lng: 99.0120, contact: "081-XXX-XXXX", desc: "หาคนช่วยล้างแอร์ จำนวน 2 เครื่องด่วน ขอคนที่อยู่ในพื้นที่ไทรโยค เดินทางมาสะดวกครับ", expiryDate: setExpiry(7) },
+            { id: 2, title: "หาคนช่วยขนของที่ทองผาภูมิ", company: "ป้าแมว", location: "ทองผาภูมิ", salary: "500", type: "general", lat: 14.7430, lng: 98.6360, contact: "Line: @mamaew", desc: "หาคนช่วยย้ายเฟอร์นิเจอร์ในตลาดทองผาภูมิครับ งานไม่หนักมาก!", expiryDate: setExpiry(3) }
+        ];
+
+        let map = null;
+        let pickerMap = null;
+        let pickerMarker = null;
+        let markers = {};
+        let activeJobId = null;
+        let sortAsc = true;
+        let filteredJobs = [...JOBS];
+        let serviceCircle = null;
+
+        function initMap() {
+            map = L.map('leaflet-map', { zoomControl: false }).setView([TEST_CENTER.lat, TEST_CENTER.lng], 10);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 20
+            }).addTo(map);
+            serviceCircle = L.circle([TEST_CENTER.lat, TEST_CENTER.lng], {
+                color: '#6366f1', fillColor: '#6366f1', fillOpacity: 0.04, radius: SERVICE_RADIUS_KM * 1000, dashArray: '5, 10', weight: 1
+            }).addTo(map);
+            L.control.zoom({ position: 'topright' }).addTo(map);
+            renderMapMarkers(filteredJobs);
+        }
+
+        function centerToHome() { map.flyTo([TEST_CENTER.lat, TEST_CENTER.lng], 11); }
+
+        function populateCategoryUI() {
+            const filterSelect = document.getElementById('filter-type');
+            const categoryGrid = document.getElementById('form-category-grid');
+            filterSelect.innerHTML = '<option value="all">ทุกหมวดหมู่</option>';
+            categoryGrid.innerHTML = '';
+            Object.keys(TYPE_CONFIG).forEach(key => {
+                const item = TYPE_CONFIG[key];
+                filterSelect.innerHTML += `<option value="${key}">${item.label}</option>`;
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.className = `category-btn p-3 rounded-xl flex flex-col items-center justify-center gap-1 text-center bg-white ${document.getElementById('form-category-input').value === key ? 'active' : ''}`;
+                btn.dataset.key = key;
+                btn.innerHTML = `<i data-lucide="${item.icon}" class="w-5 h-5"></i><span class="text-[10px] font-bold leading-tight">${item.label}</span>`;
+                btn.onclick = () => selectCategory(key, true);
+                categoryGrid.appendChild(btn);
+            });
+            lucide.createIcons({ nodes: [categoryGrid] });
+        }
+
+        function selectCategory(key, shouldRefine = false) {
+            document.getElementById('form-category-input').value = key;
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.key === key));
+            if (shouldRefine) analyzeAndRefine(false);
+        }
+
+        function selectDuration(days) {
+            document.getElementById('form-duration-input').value = days;
+            document.querySelectorAll('.duration-btn').forEach(btn => btn.classList.toggle('active', parseInt(btn.dataset.days) === days));
+        }
+
+        function analyzeAndRefine(autoDetectCategory = true) {
+            const titleInput = document.getElementById('job-title-input');
+            const descTextarea = document.getElementById('job-desc-textarea');
+            const locationInput = document.getElementById('form-location-input');
+            const label = document.getElementById('category-suggest-label');
+            const title = titleInput.value.trim();
+            const location = locationInput.value.trim() || "[พื้นที่ระบุ]";
+            if (!title) { label.classList.add('hidden'); return; }
+            let detectedKey = document.getElementById('form-category-input').value;
+            if (autoDetectCategory) {
+                let newDetected = false;
+                for (const key in TYPE_CONFIG) {
+                    if (TYPE_CONFIG[key].keywords.some(kw => title.toLowerCase().includes(kw))) {
+                        detectedKey = key;
+                        selectCategory(key, false);
+                        label.classList.remove('hidden');
+                        newDetected = true;
+                        break;
+                    }
+                }
+                if (!newDetected) label.classList.add('hidden');
+            }
+            if (descTextarea.value.length < 5 || descTextarea.dataset.isAiGenerated === "true") {
+                descTextarea.value = TYPE_CONFIG[detectedKey].template(title, location);
+                descTextarea.dataset.isAiGenerated = "true";
+            }
+        }
+
+        function initPickerMap(lat, lng) {
+            const startLat = lat || TEST_CENTER.lat;
+            const startLng = lng || TEST_CENTER.lng;
+            if (!pickerMap) {
+                pickerMap = L.map('picker-map', { zoomControl: false }).setView([startLat, startLng], 12);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(pickerMap);
+                pickerMarker = L.marker([startLat, startLng], { draggable: true }).addTo(pickerMap);
+                pickerMarker.on('dragend', () => updatePickerCoords(pickerMarker.getLatLng().lat, pickerMarker.getLatLng().lng));
+                pickerMap.on('click', (e) => { pickerMarker.setLatLng(e.latlng); updatePickerCoords(e.latlng.lat, e.latlng.lng); });
+            } else {
+                pickerMap.setView([startLat, startLng], 12);
+                pickerMarker.setLatLng([startLat, startLng]);
+                setTimeout(() => pickerMap.invalidateSize(), 200);
+            }
+            updatePickerCoords(startLat, startLng);
+        }
+
+        async function fetchAddress(lat, lng) {
+            const display = document.getElementById('display-address');
+            display.classList.add('loading-pulse');
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=th`);
+                const data = await response.json();
+                if (data && data.display_name) {
+                    display.textContent = data.display_name;
+                    document.getElementById('form-address').value = data.display_name;
+                    const suburb = data.address.suburb || data.address.village || data.address.district || '';
+                    if (suburb) { document.getElementById('form-location-input').value = suburb; analyzeAndRefine(true); }
+                }
+            } catch (e) { display.textContent = 'ระบุตำแหน่งสำเร็จ'; }
+            finally { display.classList.remove('loading-pulse'); }
+        }
+
+        function updatePickerCoords(lat, lng) {
+            const statusBox = document.getElementById('location-status-box');
+            const statusIconContainer = document.getElementById('location-status-icon');
+            const statusTitle = document.getElementById('location-status-title');
+            const submitBtn = document.getElementById('submit-post-btn');
+            const display = document.getElementById('display-address');
+
+            document.getElementById('form-lat').value = lat;
+            document.getElementById('form-lng').value = lng;
+            document.getElementById('display-coords').textContent = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+
+            const distance = getDistance(TEST_CENTER.lat, TEST_CENTER.lng, lat, lng);
+
+            if (distance > SERVICE_RADIUS_KM) {
+                statusBox.className = "bg-rose-50 border border-rose-200 p-3 rounded-xl transition-all duration-300";
+                statusTitle.textContent = `นอกพื้นที่บริการ (${distance.toFixed(1)} กม.)`;
+                statusTitle.className = "text-[10px] font-bold text-rose-500 uppercase leading-none mb-1";
+                statusIconContainer.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>`;
+                submitBtn.disabled = true;
+                submitBtn.className = "w-full py-4 bg-slate-300 text-white rounded-2xl font-bold cursor-not-allowed text-sm flex items-center justify-center gap-2";
+                submitBtn.innerHTML = `<i data-lucide="map-pin-off" class="w-5 h-5"></i> นอกพื้นที่ให้บริการ`;
+            } else {
+                statusBox.className = "bg-indigo-50 border border-indigo-100 p-3 rounded-xl transition-all duration-300";
+                statusTitle.textContent = "ตำแหน่งที่เลือก";
+                statusTitle.className = "text-[10px] font-bold text-indigo-400 uppercase leading-none mb-1";
+                statusIconContainer.innerHTML = `<i data-lucide="map-pin" class="w-4 h-4 text-indigo-600"></i>`;
+                submitBtn.disabled = false;
+                submitBtn.className = "w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition shadow-lg active:scale-95 text-sm flex items-center justify-center gap-2";
+                submitBtn.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i> ยืนยันการลงประกาศ`;
+            }
+
+            lucide.createIcons({ nodes: [statusBox, submitBtn] });
+            fetchAddress(lat, lng);
+        }
+
+        // ฟังก์ชันหาตำแหน่งแบบ Optimize เพื่อแก้ปัญหาค้าง
+        function getCurrentLocation() {
+            const display = document.getElementById('display-address');
+            const btn = document.getElementById('get-geo-btn');
+            const tip = document.getElementById('geo-tip');
+
+            if ("geolocation" in navigator) {
+                display.textContent = 'กำลังหาพิกัด... โปรดรอสักครู่';
+                display.classList.add('loading-pulse');
+                btn.disabled = true;
+                tip.classList.remove('hidden'); // แสดงข้อความแนะนำ
+
+                // ลองหาแบบธรรมดาก่อน (เร็วกว่า)
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        btn.disabled = false;
+                        display.classList.remove('loading-pulse');
+                        tip.classList.add('hidden');
+                        initPickerMap(pos.coords.latitude, pos.coords.longitude);
+                    },
+                    err => {
+                        btn.disabled = false;
+                        display.classList.remove('loading-pulse');
+                        let msg = "ไม่สามารถหาตำแหน่งอัตโนมัติได้";
+                        if (err.code === 1) msg = "โปรดกดยืนยัน 'อนุญาต' ที่ด้านบนเบราว์เซอร์";
+                        else if (err.code === 3) msg = "สัญญาณอ่อนหรือหมดเวลา โปรดจิ้มเลือกบนแผนที่";
+                        display.textContent = msg;
+                    },
+                    {
+                        enableHighAccuracy: false, // ปิด High Accuracy เพื่อความเร็ว
+                        timeout: 15000, // เพิ่มเวลาเป็น 15 วินาที
+                        maximumAge: 60000
+                    }
+                );
+            } else {
+                display.textContent = "เบราว์เซอร์นี้ไม่รองรับการระบุตำแหน่ง";
+            }
+        }
+
+        function renderMapMarkers(jobs) {
+            const jobIds = new Set(jobs.map(j => j.id));
+            Object.keys(markers).forEach(id => { if (!jobIds.has(parseInt(id))) { map.removeLayer(markers[id].marker); delete markers[id]; } });
+            jobs.forEach(job => {
+                const config = TYPE_CONFIG[job.type];
+                if (!markers[job.id]) {
+                    const html = `<div class="job-marker" style="width:32px;height:32px;background-color:${config.hex};"><i data-lucide="${config.icon}" style="width:16px;height:16px;"></i></div>`;
+                    const icon = L.divIcon({ html, className: '', iconSize: [32, 32], iconAnchor: [16, 16] });
+                    const marker = L.marker([job.lat, job.lng], { icon }).addTo(map);
+                    marker.on('click', () => selectJob(job.id));
+                    markers[job.id] = { marker, job };
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function renderJobList(jobs) {
+            const list = document.getElementById('job-list');
+            const noResults = document.getElementById('no-results');
+            document.getElementById('job-count-badge').textContent = jobs.length + ' ประกาศ';
+            if (jobs.length === 0) { list.style.display = 'none'; noResults.style.display = 'flex'; return; }
+            list.style.display = ''; noResults.style.display = 'none';
+            list.innerHTML = '';
+            jobs.forEach((job, i) => {
+                const config = TYPE_CONFIG[job.type];
+                const card = document.createElement('div');
+                card.dataset.jobId = job.id;
+                card.className = `job-card rounded-xl border p-3 cursor-pointer fade-up ${activeJobId === job.id ? 'border-indigo-500 bg-indigo-50' : 'border-slate-100 bg-white'}`;
+                card.onclick = () => selectJob(job.id);
+                card.innerHTML = `
+      <div class="flex items-start justify-between gap-1 mb-1.5">
+        <h3 class="font-bold text-xs md:text-sm leading-tight text-slate-800 line-clamp-1">${job.title}</h3>
+        <span class="tag ${config.bg} ${config.text} shrink-0"><i data-lucide="${config.icon}" class="w-2.5 h-2.5"></i></span>
+      </div>
+      <div class="flex flex-col gap-1 text-[10px] md:text-[11px] text-slate-500">
+        <div class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3 h-3 text-red-400"></i><span>${job.location}</span></div>
+        <div class="flex items-center gap-1.5 font-bold text-emerald-600">฿${job.salary}</div>
+      </div>
+    `;
+                list.appendChild(card);
+            });
+            lucide.createIcons({ nodes: [list] });
+        }
+
+        function selectJob(id) {
+            activeJobId = id;
+            if (map && markers[id]) map.flyTo([markers[id].job.lat, markers[id].job.lng], 14, { duration: 1 });
+            renderJobList(filteredJobs);
+            const card = document.querySelector(`#job-list [data-job-id="${id}"]`);
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            openModal(id);
+        }
+
+        function openModal(id) {
+            const job = JOBS.find(j => j.id === id);
+            if (!job) return;
+            const config = TYPE_CONFIG[job.type];
+            const expiryDate = new Date(job.expiryDate).toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+            document.getElementById('modal-title').textContent = job.title;
+            document.getElementById('modal-company').textContent = job.company;
+            document.getElementById('modal-tag-container').innerHTML = `<span class="tag ${config.bg} ${config.text} px-2 py-0.5">${config.label}</span>`;
+            document.getElementById('modal-body').innerHTML = `
+    <div class="grid grid-cols-2 gap-2">
+      <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+        <div class="text-[9px] font-bold text-indigo-400 uppercase">งบประมาณ</div>
+        <div class="text-sm font-bold text-indigo-700">฿${job.salary}</div>
+      </div>
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <div class="text-[9px] font-bold text-slate-400 uppercase">พื้นที่</div>
+        <div class="text-sm font-bold text-slate-700">${job.location}</div>
+      </div>
+    </div>
+    <div class="p-3 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-2">
+        <i data-lucide="calendar-clock" class="w-4 h-4 text-amber-600"></i>
+        <div class="text-[11px] text-amber-700 font-medium">ประกาศนี้จะปิดรับในวันที่: <b>${expiryDate}</b></div>
+    </div>
+    <div class="text-xs text-slate-600 leading-relaxed whitespace-pre-line p-3 bg-white border border-slate-100 rounded-xl">${job.desc}</div>
+    <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 shadow-sm"><i data-lucide="phone" class="w-4 h-4 text-white"></i></div>
+      <div>
+        <div class="text-[9px] font-bold text-emerald-600 uppercase">ติดต่อผู้จ้าง</div>
+        <div class="text-sm font-bold text-emerald-800">${job.contact}</div>
+      </div>
+    </div>
+  `;
+            document.getElementById('modal-overlay').style.display = 'flex';
+            lucide.createIcons({ nodes: [document.getElementById('modal-content')] });
+        }
+
+        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
+        function openAddModal() { document.getElementById('add-modal-overlay').style.display = 'flex'; initPickerMap(); populateCategoryUI(); selectDuration(3); }
+        function closeAddModal() { document.getElementById('add-modal-overlay').style.display = 'none'; }
+
+        function showAppToast(title, desc, type = 'success') {
+            const toast = document.getElementById('app-toast');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-desc').textContent = desc;
+            if (type === 'error') {
+                toast.className = "fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[100] bg-rose-600 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none";
+                icon.setAttribute('data-lucide', 'alert-circle');
+            } else {
+                toast.className = "fixed bottom-[-100px] left-1/2 -translate-x-1/2 z-[100] bg-emerald-600 text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transition-all duration-500 opacity-0 pointer-events-none";
+                icon.setAttribute('data-lucide', 'check');
+            }
+            lucide.createIcons({ nodes: [toast] });
+            toast.classList.add('toast-active');
+            setTimeout(() => { toast.classList.remove('toast-active'); }, 4000);
+        }
+
+        function filterAndRender() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            const type = document.getElementById('filter-type').value;
+            const now = new Date();
+            filteredJobs = JOBS.filter(j => {
+                if (new Date(j.expiryDate) < now) return false;
+                const dist = getDistance(TEST_CENTER.lat, TEST_CENTER.lng, j.lat, j.lng);
+                if (dist > SERVICE_RADIUS_KM) return false;
+                return (type === 'all' || j.type === type) && (!q || j.title.toLowerCase().includes(q) || j.location.toLowerCase().includes(q));
+            });
+            renderMapMarkers(filteredJobs);
+            renderJobList(filteredJobs);
+        }
+
+        document.getElementById('search-input').addEventListener('input', filterAndRender);
+        document.getElementById('filter-type').addEventListener('change', filterAndRender);
+        document.getElementById('job-title-input').addEventListener('input', () => analyzeAndRefine(true));
+        document.getElementById('form-location-input').addEventListener('input', () => analyzeAndRefine(false));
+
+        document.getElementById('add-job-form').onsubmit = (e) => {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const durationDays = parseInt(fd.get('duration'));
+            const lat = parseFloat(fd.get('lat'));
+            const lng = parseFloat(fd.get('lng'));
+            if (getDistance(TEST_CENTER.lat, TEST_CENTER.lng, lat, lng) > SERVICE_RADIUS_KM) {
+                showAppToast("ลงประกาศไม่ได้", "ตำแหน่งอยู่นอกพื้นที่ให้บริการ", "error");
+                return;
+            }
+            const newJob = { id: Date.now(), title: fd.get('title'), company: fd.get('company'), location: fd.get('location'), salary: fd.get('salary'), type: fd.get('type'), contact: fd.get('contact'), lat, lng, desc: fd.get('desc'), expiryDate: setExpiry(durationDays) };
+            JOBS.unshift(newJob);
+            closeAddModal(); e.target.reset(); filterAndRender(); selectJob(newJob.id);
+            showAppToast("ลงประกาศสำเร็จ!", "งานของคุณแสดงอยู่บนแผนที่เรียบร้อยแล้ว");
+        };
+
+        window.onload = () => { initMap(); populateCategoryUI(); filterAndRender(); lucide.createIcons(); };
+    </script>
+</body>
+
+</html>
